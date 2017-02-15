@@ -11,6 +11,9 @@ function DrawableInterface(body, shape)
     self.draw = function()
     end
 
+    self.update = function()
+    end
+
     return self
 end
 
@@ -37,6 +40,20 @@ function normalVelocity(sx, sy)
     return {sx, sy}
 end
 
+function makeBall(body, opts)
+    local radius = opts and opts.radius or 20
+    local self = DrawableInterface(body, love.physics.newCircleShape(radius)) 
+    self.color = opts and opts.color or {0, 0, 0}
+    self.radius = radius
+
+    self.draw = function()
+        love.graphics.setColor(unpack(self.color))
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
+        love.graphics.setColor(220, 220, 200)
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-10)
+    end
+end
+
 function makeDude(body, opts)
     local radius = opts and opts.radius or 20
     local self = DrawableInterface(body, love.physics.newCircleShape(radius)) 
@@ -44,23 +61,26 @@ function makeDude(body, opts)
     self.radius = radius
     self.boosted = nil
     -- bounce settings
-    self.fixture:setRestitution(0.99)
-    self.body:setLinearVelocity(50, 10) --let the ball bounce
+    self.fixture:setRestitution(0.3)
     self.body:setLinearDamping(0.5) --let the ball bounce
     self.fixture:setFriction(0.01) --let the ball bounce
 
     self.draw = function()
         love.graphics.setColor(unpack(self.color))
-        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
-        love.graphics.setColor(200, 200, 200)
-        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius()-10)
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
+        love.graphics.setColor(100, 100, 100)
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-10)
 
         local sx, sy = self.body:getLinearVelocity()
         local s = normalVelocity(sx, sy)
-        local r = self.shape:getRadius()
         love.graphics.setColor(0, 0, 0)
-        love.graphics.circle("fill", self.body:getX()+(s[1]*r), 
-        self.body:getY()+(s[2]*r), 4)
+        if self.debug then
+            print(s[1], s[2])
+        end
+        love.graphics.circle("fill",
+            self.body:getX()+(s[1]*self.radius),
+            self.body:getY()+(s[2]*self.radius),
+            4)
 
     end
 
@@ -134,16 +154,22 @@ function makeBoard()
     makeEdge( love.physics.newBody(self.world, 0, 0), {0, self.size, self.size, self.size} )
     -- player
     self.guy = makeDude( love.physics.newBody(self.world, self.size/2, self.size/2, "dynamic") )
+    self.guy.debug = true
+    self.active_objects = {self.world, self.guy, self.ball}
     -- computer managed dudes
     self.opponents = {
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color={200, 50, 40}}),
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 200, 40}}),
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {40, 200, 200}}),
-        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {100, 100, 100}}),
-        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {100, 100, 100}}),
-        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {100, 100, 100}}),
-        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {100, 100, 100}}),
+        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 100, 100}}),
+        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 100, 100}}),
+        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 100, 100}}),
+        makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 100, 100}}),
     }
+    for dude in ipairs(self.opponents) do
+        table.insert(self.active_objects, 1, dude)
+    end
+    self.ball = makeBall( love.physics.newBody(self.world, self.size/2+self.guy.radius, self.size/2, "dynamic") )
 
     self.update = function(dt)
         self.world:update(dt)

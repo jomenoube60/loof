@@ -1,16 +1,18 @@
-function Drawable(body, shape)
+function DrawableInterface(body, shape)
     local self = {
         body = body,
         shape = shape or love.physics.newRectangleShape(0, 0, 50, 100)
     }
     self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- A higher density gives it more mass.
+
+    self.draw = function()
+    end
+
     return self
 end
 
 function makeEdge(body, position)
-    local self = Drawable(body, love.physics.newEdgeShape(unpack(position)))
-    self.draw = function()
-    end
+    local self = DrawableInterface(body, love.physics.newEdgeShape(unpack(position)))
     self.shape = love.physics.newEdgeShape(unpack(position))
     self.fixture = love.physics.newFixture(self.body, self.shape)
     self.fixture:setRestitution(0.0001)
@@ -21,10 +23,15 @@ end
 
 function makeDude(body, opts)
     local radius = opts and opts.radius or 20
-    local self = Drawable(body, love.physics.newCircleShape(radius)) 
+    local self = DrawableInterface(body, love.physics.newCircleShape(radius)) 
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
     self.boosted = 0
+    -- bounce settings
+    self.fixture:setRestitution(0.99)
+    self.body:setLinearVelocity(50, 10) --let the ball bounce
+    self.body:setLinearDamping(1) --let the ball bounce
+    self.fixture:setFriction(0.9) --let the ball bounce
 
     self.draw = function()
         love.graphics.setColor(unpack(self.color))
@@ -73,12 +80,6 @@ function makeDude(body, opts)
         end
     end
 
-    -- bounce settings
-    self.fixture:setRestitution(0.99)
-    self.body:setLinearVelocity(50, 10) --let the ball bounce
-    self.body:setLinearDamping(1) --let the ball bounce
-    self.fixture:setFriction(0.9) --let the ball bounce
-
     return self
 end
 
@@ -87,11 +88,18 @@ function makeBoard()
         world = love.physics.newWorld(0, 0, true), --create a world for the bodies to exist in with horizontal gravity of 0 and vertical gravity of 9.81
         size = 650
     }
+
+    --initial graphics setup
+    love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue
+    love.window.setMode(self.size, self.size) --set the window dimensions to 650 by 650 with no fullscreen, vsync on, and no antialiasing
+    -- terrain limits
     makeEdge( love.physics.newBody(self.world, 0, 0), {0, 0, self.size, 0} )
     makeEdge( love.physics.newBody(self.world, 0, 0), {0, 0, 0, self.size} )
     makeEdge( love.physics.newBody(self.world, 0, 0), {self.size, 0, self.size, self.size} )
     makeEdge( love.physics.newBody(self.world, 0, 0), {0, self.size, self.size, self.size} )
+    -- player
     self.guy = makeDude( love.physics.newBody(self.world, self.size/2, self.size/2, "dynamic") )
+    -- computer managed dudes
     self.opponents = {
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color={200, 50, 40}}),
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {200, 200, 40}}),
@@ -102,9 +110,6 @@ function makeBoard()
         makeDude( love.physics.newBody(self.world, love.math.random(self.size), love.math.random(self.size), "dynamic") , {color= {100, 100, 100}}),
     }
 
-    --initial graphics setup
-    love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue
-    love.window.setMode(self.size, self.size) --set the window dimensions to 650 by 650 with no fullscreen, vsync on, and no antialiasing
     self.update = function(dt)
         self.world:update(dt)
         self.guy.update(dt)
@@ -112,6 +117,7 @@ function makeBoard()
             g.update(dt)
         end
     end
+
     self.draw = function()
         love.graphics.setColor(14, 70, 160) -- set the drawing color to green for the ground
         love.graphics.polygon("fill", 0, 0, self.size, 0, self.size, self.size, 0, self.size)
@@ -133,28 +139,35 @@ function makeGame()
     self.draw = function()
         self.board.draw()
     end
+
     self.update = function(dt)
         self.board.update(dt)
         local power = 400
         for i, g in ipairs(self.board.opponents) do
-            g.push( love.math.random(-400, 400), love.math.random(-400, 400) )
+            g.push( love.math.random(-power, power), love.math.random(-power, power) )
         end
         local dude = game.board.guy
-        local sx, sy = dude.body:getLinearVelocity()
+        -- ui keys
         if love.keyboard.isDown('escape') then
             love.event.quit()
             return
         end
+        -- special keys
+        if love.keyboard.isDown("space") then
+            dude.boost()
+        end
+        -- direction keys
+        local sx, sy = dude.body:getLinearVelocity()
         if math.abs(sx)+math.abs(sy) < self.max_speed then
             --here we are going to create some keyboard events
             local num_directions = 0
             local direction_keys = {
-                right= function() dude.push(power, 0) end,
-                left= function() dude.push(-power, 0) end,
-                up= function() dude.push(0, -power) end,
-                down= function() dude.push(0, power) end,
+                          right  = function() dude.push(power, 0) end,
+                          left   = function() dude.push(-power, 0) end,
+                          up     = function() dude.push(0, -power) end,
+                          down   = function() dude.push(0, power) end,
             }
-            local pressed = {}
+            local pressed = {} -- store pressed keys to avoid race conditions
             for x in pairs(direction_keys) do
                 if love.keyboard.isDown(x) then
                     num_directions = num_directions + 1
@@ -164,9 +177,6 @@ function makeGame()
             power = power / num_directions
             for i, x in ipairs(pressed) do
                 direction_keys[x]()
-            end
-            if love.keyboard.isDown("space") then
-                dude.boost()
             end
         end 
     end
@@ -179,9 +189,10 @@ function love.load()
 end
 
 function love.update(dt)
-  game.update(dt)
+    game.update(dt)
 end
 
 function love.draw()
     game.draw()
 end
+

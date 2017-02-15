@@ -1,5 +1,5 @@
 local POWER = 400
-local DISTANCE = 60
+local DISTANCE = 70
 
 function DrawableInterface(body, shape)
     local self = {
@@ -24,12 +24,25 @@ function makeEdge(body, position)
     return self
 end
 
+function normalVelocity(sx, sy)
+    local asx = math.abs(sx)
+    local asy = math.abs(sy)
+    if asx > asy then
+        sy = sy / asx
+        sx = sx / asx
+    else
+        sx = sx / asy
+        sy = sy / asy
+    end
+    return {sx, sy}
+end
+
 function makeDude(body, opts)
     local radius = opts and opts.radius or 20
     local self = DrawableInterface(body, love.physics.newCircleShape(radius)) 
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
-    self.boosted = 0
+    self.boosted = nil
     -- bounce settings
     self.fixture:setRestitution(0.99)
     self.body:setLinearVelocity(50, 10) --let the ball bounce
@@ -43,45 +56,62 @@ function makeDude(body, opts)
         love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius()-10)
 
         local sx, sy = self.body:getLinearVelocity()
-        asx = math.abs(sx)
-        asy = math.abs(sy)
+        local s = normalVelocity(sx, sy)
         local r = self.shape:getRadius()
-        if asx > asy then
-            sy = sy / asx
-            sx = sx / asx
-        else
-            sx = sx / asy
-            sy = sy / asy
-        end
         love.graphics.setColor(0, 0, 0)
-        love.graphics.circle("fill", self.body:getX()+(sx*r), 
-        self.body:getY()+(sy*r), 4)
+        love.graphics.circle("fill", self.body:getX()+(s[1]*r), 
+        self.body:getY()+(s[2]*r), 4)
 
     end
 
     self.update = function(dt)
-        if self.boosted then
+--        print(self.slowed_down, self.boosted)
+        if self.boosted ~= nil then
             self.boosted = dt + self.boosted
-            if self.boosted >= 0.25 and not self.slowed_down then
-                self.body:setLinearVelocity(0, 0)
-                self.slowed_down = true
-            elseif self.boosted >= 3 then
+            if self.boosted >= 0.1 then
+                if self.slowed_down == nil then
+                    self.body:setLinearVelocity(0, 0)
+                end
+            end
+
+            if self.boosted >= 0.2 then
+                self.slowed_down = self.boosted
                 self.boosted = nil
+            end
+        end
+        if self.slowed_down then
+            self.slowed_down = self.slowed_down + dt
+            if self.slowed_down > 2 then
                 self.slowed_down = nil
+                print("reset")
             end
         end
     end
 
     self.push = function(x, y)
+        if self.slowed_down == nil then
+        else
+            x = x/2
+            y = y/2
+        end
         self.body:applyForce(x, y)
     end
 
+    self.setVelocity = function(x, y)
+        self.body:setLinearVelocity(x, y)
+    end
+
     self.boost = function()
-        if self.boosted == nil then
-            self.boosted = 0
+        if self.boosted == nil and self.slowed_down == nil then
+        local sx, sy = self.body:getLinearVelocity()
+        s = normalVelocity(sx, sy)
+            self.boosted = 0.0001
             local fac = 3
-            sx, sy = self.body:getLinearVelocity()
-            self.body:setLinearVelocity(sx*fac, sy*fac)
+--            print(sx, sy)
+--            if sx
+            local function getPower(velocity)
+            end
+            self.body:setLinearVelocity(s[1] * POWER*2 , s[2]*POWER*2) 
         end
     end
 
@@ -91,7 +121,7 @@ end
 function makeBoard() 
     local self = {
         world = love.physics.newWorld(0, 0, true), --create a world for the bodies to exist in with horizontal gravity of 0 and vertical gravity of 9.81
-        size = 650
+        size = 900
     }
 
     --initial graphics setup
@@ -161,16 +191,16 @@ function makeGame()
         if love.keyboard.isDown("space") then
             dude.boost()
         end
-        -- direction keys
+        -- direction keys, special handling
         local sx, sy = dude.body:getLinearVelocity()
         if math.abs(sx)+math.abs(sy) < self.max_speed then
             --here we are going to create some keyboard events
             local num_directions = 0
             local direction_keys = {
-                          right  = function() dude.push(power, 0) end,
-                          left   = function() dude.push(-power, 0) end,
-                          up     = function() dude.push(0, -power) end,
-                          down   = function() dude.push(0, power) end,
+                          right  = function() if sx < 0 then dude.setVelocity(0, sy) else dude.push(power, 0) end end,
+                          left   = function() if sx > 0 then dude.setVelocity(0, sy) else dude.push(-power, 0) end end,
+                          up     = function() if sy > 0 then dude.setVelocity(sx, 0) else dude.push(0, -power) end end,
+                          down   = function() if sy < 0 then dude.setVelocity(sx, 0) else dude.push(0, power) end end,
             }
             local pressed = {} -- store pressed keys to avoid race conditions
             for x in pairs(direction_keys) do

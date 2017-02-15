@@ -39,6 +39,8 @@ function makeDude(body, opts)
     self.draw = function()
         love.graphics.setColor(unpack(self.color))
         love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius())
+        love.graphics.setColor(200, 200, 200)
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.shape:getRadius()-10)
 
         local sx, sy = self.body:getLinearVelocity()
         asx = math.abs(sx)

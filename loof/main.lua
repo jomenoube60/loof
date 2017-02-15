@@ -197,8 +197,8 @@ function makeGame()
             --here we are going to create some keyboard events
             local num_directions = 0
             local direction_keys = {
-                          right  = function() if sx < 0 then dude.setVelocity(0, sy) else dude.push(power, 0) end end,
                           left   = function() if sx > 0 then dude.setVelocity(0, sy) else dude.push(-power, 0) end end,
+                          right  = function() if sx < 0 then dude.setVelocity(0, sy) else dude.push(power, 0) end end,
                           up     = function() if sy > 0 then dude.setVelocity(sx, 0) else dude.push(0, -power) end end,
                           down   = function() if sy < 0 then dude.setVelocity(sx, 0) else dude.push(0, power) end end,
             }

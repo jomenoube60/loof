@@ -1,3 +1,6 @@
+local POWER = 400
+local DISTANCE = 60
+
 function DrawableInterface(body, shape)
     local self = {
         body = body,
@@ -30,8 +33,8 @@ function makeDude(body, opts)
     -- bounce settings
     self.fixture:setRestitution(0.99)
     self.body:setLinearVelocity(50, 10) --let the ball bounce
-    self.body:setLinearDamping(1) --let the ball bounce
-    self.fixture:setFriction(0.9) --let the ball bounce
+    self.body:setLinearDamping(0.5) --let the ball bounce
+    self.fixture:setFriction(0.01) --let the ball bounce
 
     self.draw = function()
         love.graphics.setColor(unpack(self.color))
@@ -133,7 +136,7 @@ function makeGame()
     local self = {
         max_speed = 20000
     }
-    love.physics.setMeter(64) --the height of a meter our worlds will be 64px
+    love.physics.setMeter(DISTANCE) --the height of a meter our worlds
     self.board = makeBoard()
 
     self.draw = function()
@@ -142,7 +145,7 @@ function makeGame()
 
     self.update = function(dt)
         self.board.update(dt)
-        local power = 400
+        local power = POWER
         for i, g in ipairs(self.board.opponents) do
             g.push( love.math.random(-power, power), love.math.random(-power, power) )
         end
@@ -174,7 +177,7 @@ function makeGame()
                     table.insert(pressed, x)
                 end
             end
-            power = power / num_directions
+            power = power / num_directions -- power is relative to the number of directions
             for i, x in ipairs(pressed) do
                 direction_keys[x]()
             end

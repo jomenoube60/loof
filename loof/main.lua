@@ -1,5 +1,5 @@
 local POWER = 400
-local DISTANCE = 70
+local DISTANCE = 30
 
 -- helper functions
 --
@@ -51,7 +51,7 @@ DrawableInterface = object:clone()
 function DrawableInterface:init(body, shape)
     self.body = body
     self.shape = shape or love.physics.newRectangleShape(0, 0, 50, 100)
-    self.fixture = love.physics.newFixture(self.body, self.shape, 5) -- A higher density gives it more mass.
+    self.fixture = love.physics.newFixture(self.body, self.shape, 1) -- A higher density gives it more mass.
     return self
 end
 
@@ -67,7 +67,6 @@ Edge = DrawableInterface:clone()
 
 function Edge:init(body, position)
     DrawableInterface.init(self, body, love.physics.newEdgeShape(unpack(position)))
-    self.fixture = love.physics.newFixture(self.body, self.shape)
     self.fixture:setRestitution(0.0001)
     self.fixture:setFriction(1)
     return self

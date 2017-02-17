@@ -51,6 +51,7 @@ function makeBoard()
             love.physics.newBody(self.world, pos[1], pos[2], "dynamic") , {color={200, 50, 40}})
         )
     end
+
     self.ball = objects.Ball:clone():init( love.physics.newBody(self.world, self.size/2+2*self.guy.radius, self.size/2, "dynamic") )
     self.active_objects = {}
     for i, dude in ipairs(self.opponents) do
@@ -61,8 +62,21 @@ function makeBoard()
 
     self.update = function(dt)
         self.world:update(dt)
+        -- allow borrowing ball when collisions are not active (w/ player has the ball)
+        r = self.ball.radius
+        bx = self.ball.body:getX()
+        by = self.ball.body:getY()
         for i, g in ipairs(self.active_objects) do
             g:update(dt)
+            if g:isa(objects.Dude) and g ~= self.ball.player then
+                local dx = (g.feet[1] + g.body:getX())/2
+                local dy = (g.feet[2] + g.body:getY())/2
+                if dx - r < bx and  dx + r > bx  and dy - r < by and dy + r > by then
+                    if self.ball.player ~= g then
+                        self.ball:attach(g)
+                    end
+                end
+            end
         end
     end
 

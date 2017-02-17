@@ -18,15 +18,12 @@ function beginContact(a, b, coll)
     end
 end
 
-function endContact(a, b, coll)
-end
-
 function makeBoard() 
     local self = {
         world = love.physics.newWorld(0, 0, true), --create a world for the bodies to exist in with horizontal gravity of 0 and vertical gravity of 9.81
         size = 900
     }
-    self.world:setCallbacks(beginContact, endContact)
+    self.world:setCallbacks(beginContact)
 
     --initial graphics setup
     love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue

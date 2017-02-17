@@ -87,8 +87,9 @@ function Ball:init(body, opts)
     self.radius = radius
     self.body:setMass(0.1)
     self.fixture:setDensity(0.5)
-    self.fixture:setFriction(0.9)
-    self.fixture:setRestitution(0.8)
+    self.fixture:setFriction(0.2)
+    self.body:setLinearDamping(0.3)
+    self.fixture:setRestitution(0.9)
     return self
 end
 
@@ -174,7 +175,7 @@ function Dude:update(dt)
             self:boost()
         end
         self.pushed = self.pushed + dt
-        if self.pushed > 2 then
+        if self.pushed > 0.2 then
             self.pushed = nil
         end
     end

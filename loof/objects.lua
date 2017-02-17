@@ -43,8 +43,6 @@ function normalVelocity(sx, sy)
     return {sx, sy}
 end
 
-
-
 -- Types:
 --
 -- interfaces
@@ -103,10 +101,14 @@ end
 
 function Ball:update(dt)
     if self.player ~= nil then
-        local x = self.player.feet[1] - self.body:getX() 
-        local y = self.player.feet[2] - self.body:getY()
---        self.body:applyLinearImpulse(x, y)
+        if self.body:isActive() then
+            self.body:setActive(false)
+        end
         self.body:setPosition(unpack(self.player.feet))
+    else
+        if not self.body:isActive() then
+            self.body:setActive(true)
+        end
     end
 end
 
@@ -119,10 +121,6 @@ function Ball:attach(player)
     end
     if player then
         player.ball = self
-        self.fixture:setRestitution(0.0001)
-        self.fixture:setDensity(1)
-    else
-        self.fixture:setRestitution(0.8)
     end
     self.player = player
 end

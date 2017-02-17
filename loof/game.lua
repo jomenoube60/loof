@@ -45,7 +45,8 @@ function makeBoard()
     self.guy.debug = cfg.DEBUG
     -- computer managed dudes
     self.opponents = {}
-    for i=1,10 do
+
+    for i=1,cfg.DUDES do
         local pos = rnd(self.size)
         table.insert(self.opponents,
             objects.Dude:clone():init(

@@ -3,4 +3,5 @@ return {
     DISTANCE = 30,
     SIZE = 700,
     DEBUG = false,
+    DUDES = 10,
 }

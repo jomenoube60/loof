@@ -138,6 +138,7 @@ function Dude:init(body, opts)
     self.body:setLinearDamping(0.5)
     self.fixture:setFriction(1)
     self.fixture:setUserData('Dude')
+    self.feet = {0, 0}
     return self
 end
 

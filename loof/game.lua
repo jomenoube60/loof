@@ -1,19 +1,36 @@
 objects = require('objects')
 cfg = require('config')
 
-function beginContact(a, b, coll)
+function dprint(txt)
+    if cfg.DEBUG then
+        print(txt)
+    end
+end
+
+function beginContact(a, b, coll) -- collision handling
     local player = nil
     local ball = nil
-    if a:getUserData() == 'Ball' and b:getUserData() == 'Dude' then
+
+    a = objects.drawables[a]
+    b = objects.drawables[b]
+
+    if a:isa(objects.Ball) and b:isa(objects.Dude) then
         ball = a
         player = b
-    elseif b:getUserData() == 'Ball' and a:getUserData() == 'Dude' then
+    elseif b:isa(objects.Ball) and a:isa(objects.Dude) then
         ball = b
         player = a
+    elseif b:isa(objects.Dude) and a:isa(objects.Dude) then
+        dprint("Dude <> Dude collision")
+        if b.boosted and a.ball then
+            dprint("Booster detect")
+            a:hit()
+        elseif a.boosted and b.ball then
+            dprint("Booster detect")
+            b:hit()
+        end
     end
-    if ball then
-        ball = objects.drawables[ball]
-        player = objects.drawables[player]
+    if ball and not player.pushed then
         ball:attach(player)
     end
 end
@@ -62,17 +79,19 @@ function makeBoard()
 
     self.update = function(dt)
         self.world:update(dt)
+        local borrowable = self.ball.player ~= nil
         -- allow borrowing ball when collisions are not active (w/ player has the ball)
-        r = self.ball.radius
-        bx = self.ball.body:getX()
-        by = self.ball.body:getY()
+        local r = self.ball.radius
+        local bx = self.ball.body:getX()
+        local by = self.ball.body:getY()
         for i, g in ipairs(self.active_objects) do
             g:update(dt)
-            if g:isa(objects.Dude) and g ~= self.ball.player then
+            if borrowable and g:isa(objects.Dude) and g ~= self.ball.player then
                 local dx = (g.feet[1] + g.body:getX())/2
                 local dy = (g.feet[2] + g.body:getY())/2
                 if dx - r < bx and  dx + r > bx  and dy - r < by and dy + r > by then
                     if self.ball.player ~= g then
+                        dprint("Ball changes from " , self.ball.player , " to " , g)
                         self.ball:attach(g)
                     end
                 end
@@ -117,6 +136,7 @@ function Game:update(dt)
     -- special keys
     if love.keyboard.isDown("space") then
         dude:boost()
+        return
     end
     -- direction keys, special handling
     local sx, sy = dude.body:getLinearVelocity()

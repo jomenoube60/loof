@@ -55,7 +55,7 @@ function DrawableInterface:init(body, shape)
     self.body = body
     self.shape = shape or love.physics.newRectangleShape(0, 0, 50, 100)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1) -- A higher density gives it more mass.
-    self.body:setFixedRotation(true) -- disable rotations
+--    self.body:setFixedRotation(true) -- disable rotations
     all_drawables[self.fixture] = self
     return self
 end
@@ -87,7 +87,7 @@ function Ball:init(body, opts)
     self.radius = radius
     self.body:setMass(0.1)
     self.fixture:setDensity(0.5)
-    self.fixture:setFriction(1)
+    self.fixture:setFriction(0.9)
     self.fixture:setRestitution(0.8)
     return self
 end
@@ -113,7 +113,7 @@ function Ball:update(dt)
 end
 
 function Ball:attach(player)
-    if self.player == player then
+    if self.player == player or player ~= nil and player.shot then
         return
     end
     if self.player ~= nil then
@@ -122,6 +122,7 @@ function Ball:attach(player)
     if player then
         player.ball = self
     end
+    dprint("Ball attached to ", player)
     self.player = player
 end
 
@@ -161,8 +162,29 @@ function Dude:draw()
     self.feet = {x, y}
 end
 
+function Dude:hit()
+    self.pushed = 1
+end
+
 function Dude:update(dt)
 --    self.body:setAngle(0)
+    if self.pushed then
+        if self.pushed == 1 then
+            dprint("PUSHED, SHOOTING !!!")
+            self:boost()
+        end
+        self.pushed = self.pushed + dt
+        if self.pushed > 2 then
+            self.pushed = nil
+        end
+    end
+    if self.shot ~= nil then
+        self.shot = self.shot + dt
+        if self.shot > 1.5 then
+            self.shot = nil
+            dprint("shot = nil")
+        end
+    end
 
     if self.boosted ~= nil then
         self.boosted = dt + self.boosted
@@ -180,7 +202,7 @@ function Dude:update(dt)
         self.slowed_down = self.slowed_down + dt
         if self.slowed_down > 2 then
             self.slowed_down = nil
-            print("reset")
+            dprint("reset")
         end
     end
 end
@@ -203,12 +225,12 @@ function Dude:boost()
     s = normalVelocity(sx, sy)
     if self.ball then
         local ball = self.ball
-        print("shoot!")
+        self.shot = 1
+        dprint("shot = 1")
         ball:attach(nil)
-        ball.body:setPosition( ball.body:getX() + sx, ball.body:getY() + sy )
         ball.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
-    elseif self.boosted == nil and self.slowed_down == nil then
-        print("boost !")
+    elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
+        dprint("boost !")
         self.boosted = 0.0001
         self.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
     end

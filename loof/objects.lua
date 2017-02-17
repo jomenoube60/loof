@@ -202,9 +202,11 @@ function Dude:boost()
     local sx, sy = self.body:getLinearVelocity()
     s = normalVelocity(sx, sy)
     if self.ball then
+        local ball = self.ball
         print("shoot!")
-        self.ball.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
-        self.ball:attach(nil)
+        ball:attach(nil)
+        ball.body:setPosition( ball.body:getX() + sx, ball.body:getY() + sy )
+        ball.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
     elseif self.boosted == nil and self.slowed_down == nil then
         print("boost !")
         self.boosted = 0.0001

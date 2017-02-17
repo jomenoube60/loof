@@ -29,10 +29,11 @@ function makeBoard()
     love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue
     love.window.setMode(self.size, self.size) --set the window dimensions to 650 by 650 with no fullscreen, vsync on, and no antialiasing
     -- terrain limits
-    objects.Edge:clone():init( love.physics.newBody(self.world, 0, 0), {20, 20, self.size-20, 20} )
-    objects.Edge:clone():init( love.physics.newBody(self.world, 0, 0), {20, 20, 20, self.size-20} )
-    objects.Edge:clone():init( love.physics.newBody(self.world, 0, 0), {self.size-20, 20, self.size-20, self.size-20} )
-    objects.Edge:clone():init( love.physics.newBody(self.world, 0, 0), {20, self.size-20, self.size-20, self.size-20} )
+    local edges = love.physics.newBody(self.world, 0, 0)
+    objects.Edge:clone():init( edges, {0, 0, self.size, 20} )
+    objects.Edge:clone():init( edges, {0, 0, 0, self.size-20} )
+    objects.Edge:clone():init( edges, {self.size-20, 20, self.size-20, self.size-20} )
+    objects.Edge:clone():init( edges, {20, self.size-20, self.size-20, self.size-20} )
 
     local rnd = function(size)
         return {love.math.random(20, size-20), love.math.random(size)}

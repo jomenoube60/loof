@@ -56,17 +56,18 @@ function makeBoard()
         return {love.math.random(20, size-20), love.math.random(size)}
     end
     -- player
-    self.guy = objects.Dude:clone():init( love.physics.newBody(self.world, self.size/2, self.size/2, "dynamic") )
+    self.guy = objects.Dude:clone():init( love.physics.newBody(self.world, self.size/2, self.size/2, "dynamic") , {color={128, 179, 255}})
+    self.guy.img = objects.Sprite:clone():init('p1')
     self.guy.debug = cfg.DEBUG
     -- computer managed dudes
     self.opponents = {}
 
+    local p2 = objects.Sprite:clone():init('p2')
     for i=1,cfg.DUDES do
         local pos = rnd(self.size)
-        table.insert(self.opponents,
-            objects.Dude:clone():init(
-            love.physics.newBody(self.world, pos[1], pos[2], "dynamic") , {color={200, 50, 40}})
-        )
+        local d = objects.Dude:clone():init(love.physics.newBody(self.world, pos[1], pos[2], "dynamic") , {color={255, 70, 204}})
+        d.img = p2
+        table.insert(self.opponents, d)
     end
 
     self.ball = objects.Ball:clone():init( love.physics.newBody(self.world, self.size/2+2*self.guy.radius, self.size/2, "dynamic") )
@@ -100,7 +101,7 @@ function makeBoard()
     end
 
     self.draw = function()
-        love.graphics.setColor(14, 70, 160) -- set the drawing color to green for the ground
+        love.graphics.setColor(135, 222, 170) -- set the drawing color to green for the ground
         love.graphics.polygon("fill", 0, 0, self.size, 0, self.size, self.size, 0, self.size)
         for i, g in ipairs(self.active_objects) do
             g:draw()

@@ -1,6 +1,8 @@
 -- helper functions
 --
 -- from http://lua-users.org/wiki/InheritanceTutorial
+--
+
 
 local function clone( base_object, clone_object )
     if type( base_object ) ~= "table" then
@@ -49,6 +51,20 @@ end
 
 local all_drawables = {}
 
+local Sprite = object:clone()
+
+function Sprite:init(filename)
+    self.img = love.graphics.newImage('img/' .. filename .. '.png')
+    self.ox = - ( self.img:getWidth() / 2 )
+    self.oy = - ( self.img:getHeight() / 2 )
+    return self
+end
+
+function Sprite:draw(x, y)
+    love.graphics.setColor(255, 255, 255)
+    love.graphics.draw(self.img, x + self.ox, y + self.oy )
+end
+
 local DrawableInterface = object:clone()
 
 function DrawableInterface:init(body, shape)
@@ -90,14 +106,20 @@ function Ball:init(body, opts)
     self.fixture:setFriction(0.2)
     self.body:setLinearDamping(0.3)
     self.fixture:setRestitution(0.9)
+    self.img = Sprite:clone():init('pawn')
     return self
 end
 
 function Ball:draw()
+    --[[
     love.graphics.setColor(220, 220, 200)
     love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
     love.graphics.setColor(unpack(self.color))
     love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-5)
+    ]]
+    if self.img ~= nil then
+        self.img:draw(self.body:getX(), self.body:getY())
+    end
 end
 
 function Ball:update(dt)
@@ -145,10 +167,14 @@ function Dude:init(body, opts)
 end
 
 function Dude:draw()
-    love.graphics.setColor(unpack(self.color))
-    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
-    love.graphics.setColor(100, 100, 100)
-    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-10)
+    if self.img ~= nil then
+        self.img:draw(self.body:getX(), self.body:getY())
+    else
+        love.graphics.setColor(0, 0, 0)
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
+        love.graphics.setColor(unpack(self.color))
+        love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-5)
+    end
 
     local sx, sy = self.body:getLinearVelocity()
     local s = normalVelocity(sx, sy)
@@ -243,4 +269,5 @@ return {
     Edge = Edge,
     Dude = Dude,
     Ball = Ball,
+    Sprite = Sprite,
 }

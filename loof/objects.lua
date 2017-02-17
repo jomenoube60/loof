@@ -150,16 +150,14 @@ function Dude:draw()
 
     local sx, sy = self.body:getLinearVelocity()
     local s = normalVelocity(sx, sy)
+--    if not s[1] or not s[2] then
+--        return
+--    end
     love.graphics.setColor(0, 0, 0)
---    if self.debug then
---        print(s[1], s[2])
---    end
-    local x = self.body:getX()+(s[1]*(self.radius*1.5))
-    local y = self.body:getY()+(s[2]*(self.radius*1.5))
+    local x = self.body:getX()+(self.radius*s[1])
+    local y = self.body:getY()+(self.radius*s[2])
+
     love.graphics.circle("fill", x, y, 4)
---    if self.debug then
---        print(self.ball)
---    end
     self.feet = {x, y}
 end
 

@@ -120,14 +120,21 @@ function Game:update(dt)
     end
     -- direction keys, special handling
     local sx, sy = dude.body:getLinearVelocity()
+    local impulse = function(d, x, y)
+        if d < 0 then
+            dude:push(10*x, 10*y)
+        else
+            dude:push(x, y)
+        end
+    end
     if math.abs(sx)+math.abs(sy) < self.max_speed then
         --here we are going to create some keyboard events
         local num_directions = 0
         local direction_keys = {
-            left   = function() if sx > 0 then dude:push(10*-power, 0) else dude:push(-power, 0) end end,
-            right  = function() if sx < 0 then dude:push(10*power, 0) else dude:push(power, 0) end end,
-            up     = function() if sy > 0 then dude:push(0, 10*-power) else dude:push(0, -power) end end,
-            down   = function() if sy < 0 then dude:push(0, 10*power) else dude:push(0, power) end end,
+            left   = function() impulse(-sx, -power, 0) end,
+            right  = function() impulse(sx, power, 0) end,
+            up     = function() impulse(-sy, 0, -power) end,
+            down   = function() impulse(sy, 0, power) end,
         }
         local pressed = {} -- store pressed keys to avoid race conditions
         for x in pairs(direction_keys) do

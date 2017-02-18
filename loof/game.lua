@@ -22,11 +22,9 @@ function beginContact(a, b, coll) -- collision handling
         player = a
     elseif b:isa(objects.Dude) and a:isa(objects.Dude) then
         dprint("Dude <> Dude collision")
-        if b.boosted and a.ball then
-            dprint("Booster detect")
+        if b.boosted or b.pushed then
             a:hit()
-        elseif a.boosted and b.ball then
-            dprint("Booster detect")
+        elseif a.boosted or a.pushed then
             b:hit()
         end
     end

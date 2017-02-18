@@ -67,9 +67,8 @@ function Ball:init(body, opts)
 end
 
 function Ball:draw()
-    if self.img ~= nil then
-        self.img:draw(self.body:getX(), self.body:getY())
-    end
+    baseobj.DrawableInterface.draw(self)
+    self.img:draw(self.x, self.y)
 end
 
 function Ball:update(dt)

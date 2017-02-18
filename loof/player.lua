@@ -28,6 +28,7 @@ function Dude:reset()
 end
 
 function Dude:draw()
+    baseobj.DrawableInterface.draw(self)
     if self.img ~= nil then
         self.img:draw(self.body:getX(), self.body:getY())
     else

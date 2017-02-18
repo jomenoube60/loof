@@ -28,6 +28,8 @@ local object = clone( table, { clone = clone, isa = isa } )
 local all_drawables = {}
 
 local DrawableInterface = object:clone()
+DrawableInterface.x = 0
+DrawableInterface.y = 0
 
 function DrawableInterface:init(body, shape)
     self.body = body
@@ -38,6 +40,8 @@ function DrawableInterface:init(body, shape)
 end
 
 function DrawableInterface:draw()
+    self.x = self.body:getX()
+    self.y = self.body:getY()
 end
 
 function DrawableInterface:update()
@@ -45,6 +49,8 @@ end
 
 function DrawableInterface:reset()
     self.body:setLinearVelocity(0, 0)
+    self.x = 0
+    self.y = 0
 end
 
 local Sprite = object:clone()

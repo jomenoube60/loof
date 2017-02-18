@@ -1,3 +1,5 @@
+local ai = require('ai')
+
 function beginContact(a, b, coll) -- collision handling
     local player = nil
     local ball = nil
@@ -90,6 +92,7 @@ function Board:reset_state()
         )
         op:reset()
     end
+    self.ball:attach(nil)
 end
 
 function Board:update(dt)
@@ -98,6 +101,7 @@ function Board:update(dt)
         if self.goal_marked > 3 then
             self.goal_marked = nil -- reset game
             self:reset_state()
+            ai.clear()
         end
         return
     end

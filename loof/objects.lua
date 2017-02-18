@@ -175,11 +175,15 @@ function Dude:draw()
 --    if not s[1] or not s[2] then
 --        return
 --    end
-    love.graphics.setColor(0, 0, 0)
+    if self.slowed_down then
+        love.graphics.setColor(80, 80, 82)
+    else
+        love.graphics.setColor(240, 240, 200)
+    end
     local x = self.body:getX()+(self.radius*s[1])
     local y = self.body:getY()+(self.radius*s[2])
 
-    love.graphics.circle("fill", x, y, 4)
+    love.graphics.circle("fill", x, y, 10)
     self.feet = {x, y}
 end
 

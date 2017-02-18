@@ -35,14 +35,8 @@ local object = clone( table, { clone = clone, isa = isa } )
 function normalVelocity(sx, sy)
     local asx = math.abs(sx)
     local asy = math.abs(sy)
-    if asx > asy then
-        sy = sy / asx
-        sx = sx / asx
-    else
-        sx = sx / asy
-        sy = sy / asy
-    end
-    return {sx, sy}
+    local fac = 1/(asx + asy)
+    return { sx*fac, sy*fac }
 end
 
 -- Types:

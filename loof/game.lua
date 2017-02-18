@@ -71,7 +71,7 @@ function makeBoard()
         table.insert(self.opponents, d)
     end
 
-    self.ball = objects.Ball:clone():init( love.physics.newBody(self.world, self.size/2+2*self.guy.radius, self.size/2, "dynamic") )
+    self.ball = objects.Ball:clone():init( love.physics.newBody(self.world, self.background.width/2, self.background.height/2, "dynamic") )
     self.active_objects = {}
     for i, dude in ipairs(self.opponents) do
         table.insert(self.active_objects, dude)

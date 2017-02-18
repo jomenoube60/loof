@@ -19,4 +19,3 @@ function love.draw()
         debugWorldDraw(game.board.world,0,0,game.board.size, game.board.size)
     end
 end
-

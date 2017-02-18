@@ -42,17 +42,20 @@ function makeBoard()
 
     --initial graphics setup
     love.graphics.setBackgroundColor(104, 136, 248) --set the background color to a nice blue
-    love.window.setMode(self.size, self.size) --set the window dimensions to 650 by 650 with no fullscreen, vsync on, and no antialiasing
     -- terrain limits
+    self.background = objects.Sprite:clone():init('level0', {0,0} )
+    love.window.setMode(self.background.width, self.background.height)
+
     local edges = love.physics.newBody(self.world, 0, 0)
-    objects.Edge:clone():init( edges, {0, 0, self.size, 20} )
-    objects.Edge:clone():init( edges, {0, 0, 0, self.size-20} )
-    objects.Edge:clone():init( edges, {self.size-20, 20, self.size-20, self.size-20} )
-    objects.Edge:clone():init( edges, {20, self.size-20, self.size-20, self.size-20} )
+    objects.Edge:clone():init( edges, {0, 0, self.background.width, 0} )
+    objects.Edge:clone():init( edges, {0, 0, 0, self.background.height} )
+    objects.Edge:clone():init( edges, {self.background.width, 0, self.background.width, self.background.height} )
+    objects.Edge:clone():init( edges, {0, self.background.height,  self.background.width, self.background.height} )
 
     local rnd = function(size)
         return {love.math.random(20, size-20), love.math.random(size)}
     end
+    -- bg
     -- player
     self.guy = objects.Dude:clone():init( love.physics.newBody(self.world, self.size/2, self.size/2, "dynamic") , {color={128, 179, 255}})
     self.guy.img = objects.Sprite:clone():init('p1')
@@ -99,8 +102,9 @@ function makeBoard()
     end
 
     self.draw = function()
-        love.graphics.setColor(135, 222, 170) -- set the drawing color to green for the ground
-        love.graphics.polygon("fill", 0, 0, self.size, 0, self.size, self.size, 0, self.size)
+--        love.graphics.setColor(135, 222, 170) -- set the drawing color to green for the ground
+--        love.graphics.polygon("fill", 0, 0, self.size, 0, self.size, self.size, 0, self.size)
+        self.background:draw(0, 0)
         for i, g in ipairs(self.active_objects) do
             g:draw()
         end

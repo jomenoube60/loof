@@ -179,18 +179,20 @@ function Dude:draw()
 
     local sx, sy = self.body:getLinearVelocity()
     local s = normalVelocity(sx, sy)
+    local x = self.body:getX()+(self.radius*s[1])
+    local y = self.body:getY()+(self.radius*s[2])
 --    if not s[1] or not s[2] then
 --        return
 --    end
+    love.graphics.setColor(0, 0, 0)
+    love.graphics.circle("fill", x, y, 10)
     if self.slowed_down then
         love.graphics.setColor(80, 80, 82)
     else
         love.graphics.setColor(240, 240, 200)
     end
-    local x = self.body:getX()+(self.radius*s[1])
-    local y = self.body:getY()+(self.radius*s[2])
 
-    love.graphics.circle("fill", x, y, 10)
+    love.graphics.circle("fill", x, y, 8)
     self.feet = {x, y}
 end
 
@@ -264,7 +266,7 @@ function Dude:boost()
     elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
         dprint("boost !")
         self.boosted = 0.0001
-        self.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
+        self.body:setLinearVelocity((sx+s[1]) * cfg.POWER*0.01 , (sy+s[2])*cfg.POWER*0.01)
     end
 end
 

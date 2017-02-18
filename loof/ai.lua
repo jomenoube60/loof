@@ -20,7 +20,7 @@ local function manage(dude)
         dude:push(x, y)
     else -- togoal
         local g = game.board.goals[1]
-        local x = - cfg.POWER
+        local x = math.min( g[3] - dude.y - 0.1, cfg.POWER)
         local y = math.min( (g[2] + (g[4] - g[2])/2) - dude.y , cfg.POWER)
         dude:push(x, y)
     end

@@ -20,11 +20,11 @@ function Dude:init(body, opts)
 end
 
 function Dude:reset()
+    baseobj.DrawableInterface.reset(self)
     self.shot        = nil
     self.pushed      = nil
     self.boosted     = nil
     self.slowed_down = nil
-    baseobj.DrawableInterface.reset(self)
 end
 
 function Dude:draw()

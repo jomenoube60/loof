@@ -27,12 +27,14 @@ end
 Board = objects.object:clone()
 
 function Board:init()
+    local level = require('levels.' .. cfg.level)
     self.world = love.physics.newWorld(0, 0, true)
     self.world:setCallbacks(beginContact)
-    local level = require('levels.' .. cfg.level)
+
     self.background = objects.Sprite:clone():init(level.bg, {0,0} )
-    love.window.setMode(self.background.width, self.background.height)
     self.goal_img = objects.Sprite:clone():init('goal', {0,0} )
+
+    love.window.setMode(self.background.width, self.background.height)
 
     -- build collision elements from level data
     local edges = love.physics.newBody(self.world, 0, 0)
@@ -48,7 +50,6 @@ function Board:init()
     end
     self.goals = level.goals
 
-    -- bg
     -- player
     self.guy = objects.Dude:clone():init( love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
     self.guy.img = objects.Sprite:clone():init('p1')

@@ -2,10 +2,8 @@
 --
 -- from http://lua-users.org/wiki/InheritanceTutorial
 
-
 local baseobj = require('baseobj')
 local player = require('player')
-
 
 -- misc
 

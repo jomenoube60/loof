@@ -43,6 +43,10 @@ end
 function DrawableInterface:update()
 end
 
+function DrawableInterface:reset()
+    self.body:setLinearVelocity(0, 0)
+end
+
 local Sprite = object:clone()
 
 function Sprite:init(filename, origin)

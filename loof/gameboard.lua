@@ -28,7 +28,6 @@ Board = objects.object:clone()
 
 function Board:init()
     self.world = love.physics.newWorld(0, 0, true)
-    self.size = 900
     self.world:setCallbacks(beginContact)
     local level = require('levels.' .. cfg.level)
     self.background = objects.Sprite:clone():init(level.bg, {0,0} )
@@ -77,10 +76,10 @@ end
 
 function Board:reset_state()
     self.guy.body:setPosition( self.background.width / 4, self.background.height/2 )
-    self.guy.body:setLinearVelocity(0, 0)
+    self.guy:reset()
 
     self.ball.body:setPosition( self.background.width / 2, self.background.height/2 )
-    self.ball.body:setLinearVelocity(0, 0)
+    self.ball:reset()
 
     local op_point = {self.background.width * 3 / 4, self.background.height/2 }
     local amp = self.background.height / 5
@@ -88,7 +87,7 @@ function Board:reset_state()
         op.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
         op_point[2] + love.math.random(-amp, amp)
         )
-        op.body:setLinearVelocity(0, 0)
+        op:reset()
     end
 end
 

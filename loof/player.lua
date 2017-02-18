@@ -19,6 +19,14 @@ function Dude:init(body, opts)
     return self
 end
 
+function Dude:reset()
+    self.shot        = nil
+    self.pushed      = nil
+    self.boosted     = nil
+    self.slowed_down = nil
+    baseobj.DrawableInterface.reset(self)
+end
+
 function Dude:draw()
     if self.img ~= nil then
         self.img:draw(self.body:getX(), self.body:getY())
@@ -47,7 +55,6 @@ function Dude:hit()
 end
 
 function Dude:update(dt)
---    self.body:setAngle(0)
     if self.pushed then
         if self.pushed == 1 then
             dprint("PUSHED, SHOOTING !!!")

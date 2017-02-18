@@ -47,10 +47,17 @@ local all_drawables = {}
 
 local Sprite = object:clone()
 
-function Sprite:init(filename)
+function Sprite:init(filename, origin)
     self.img = love.graphics.newImage('img/' .. filename .. '.png')
-    self.ox = - ( self.img:getWidth() / 2 )
-    self.oy = - ( self.img:getHeight() / 2 )
+    self.width = self.img:getWidth()
+    self.height = self.img:getHeight()
+    if origin then
+        self.ox = origin[1]
+        self.oy = origin[2]
+    else
+        self.ox = - ( self.width / 2 )
+        self.oy = - ( self.height / 2 )
+    end
     return self
 end
 
@@ -152,9 +159,9 @@ function Dude:init(body, opts)
     self.radius = radius
     self.boosted = nil
     -- bounce settings
-    self.fixture:setRestitution(0.1)
+    self.fixture:setRestitution(0.8)
     self.body:setLinearDamping(0.5)
-    self.fixture:setFriction(1)
+    self.fixture:setFriction(0.3)
     self.fixture:setUserData('Dude')
     self.feet = {0, 0}
     return self

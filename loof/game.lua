@@ -80,7 +80,7 @@ function makeBoard()
         self.world:update(dt)
         local borrowable = self.ball.player ~= nil
         -- allow borrowing ball when collisions are not active (w/ player has the ball)
-        local r = self.ball.radius * 1.5
+        local r = self.ball.radius * 2
         local bx = self.ball.body:getX()
         local by = self.ball.body:getY()
         for i, g in ipairs(self.active_objects) do

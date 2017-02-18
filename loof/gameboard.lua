@@ -30,7 +30,7 @@ function Board:init()
     self.world = love.physics.newWorld(0, 0, true)
     self.size = 900
     self.world:setCallbacks(beginContact)
-    level = require('levels.' .. cfg.level)
+    local level = require('levels.' .. cfg.level)
     self.background = objects.Sprite:clone():init(level.bg, {0,0} )
     love.window.setMode(self.background.width, self.background.height)
     self.goal_img = objects.Sprite:clone():init('goal', {0,0} )

@@ -94,6 +94,25 @@ function Edge:init(body, position)
     return self
 end
 
+local Rectangle = DrawableInterface:clone()
+
+function Rectangle:init(body, coords)
+    local co = { coords[1], coords[2], coords[3], coords[2], coords[3], coords[4], coords[1], coords[4] }
+    DrawableInterface.init(self, body, love.physics.newPolygonShape(unpack(co)))
+    self.fixture:setRestitution(0.01)
+    self.fixture:setFriction(1)
+    return self
+end
+
+local Poly2 = DrawableInterface:clone()
+
+function Poly2:init(body, coords)
+    DrawableInterface.init(self, body, love.physics.newChainShape(true, unpack(coords)))
+    self.fixture:setRestitution(0.01)
+    self.fixture:setFriction(1)
+    return self
+end
+
 local Ball = DrawableInterface:clone()
 
 function Ball:init(body, opts)
@@ -107,17 +126,11 @@ function Ball:init(body, opts)
     self.fixture:setFriction(0.2)
     self.body:setLinearDamping(0.3)
     self.fixture:setRestitution(0.9)
-    self.img = Sprite:clone():init('pawn')
+    self.img = Sprite:clone():init('ball')
     return self
 end
 
 function Ball:draw()
-    --[[
-    love.graphics.setColor(220, 220, 200)
-    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
-    love.graphics.setColor(unpack(self.color))
-    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-5)
-    ]]
     if self.img ~= nil then
         self.img:draw(self.body:getX(), self.body:getY())
     end
@@ -151,6 +164,8 @@ function Ball:attach(player)
 end
 
 local Dude = DrawableInterface:clone()
+Dude.head = Sprite:clone():init('pawn')
+Dude.head_slow = Sprite:clone():init('pawn_slow')
 
 function Dude:init(body, opts)
     local radius = opts and opts.radius or 20
@@ -181,18 +196,12 @@ function Dude:draw()
     local s = normalVelocity(sx, sy)
     local x = self.body:getX()+(self.radius*s[1])
     local y = self.body:getY()+(self.radius*s[2])
---    if not s[1] or not s[2] then
---        return
---    end
-    love.graphics.setColor(0, 0, 0)
-    love.graphics.circle("fill", x, y, 10)
-    if self.slowed_down then
-        love.graphics.setColor(80, 80, 82)
-    else
-        love.graphics.setColor(240, 240, 200)
-    end
 
-    love.graphics.circle("fill", x, y, 8)
+    if self.slowed_down then
+        self.head_slow:draw(x, y)
+    else
+        self.head:draw(x, y)
+    end
     self.feet = {x, y}
 end
 
@@ -274,6 +283,9 @@ return {
     drawables = all_drawables,
     object = object,
     Edge = Edge,
+    Poly = Poly,
+    Poly2 = Poly2,
+    Rectangle = Rectangle,
     Dude = Dude,
     Ball = Ball,
     Sprite = Sprite,

@@ -1,5 +1,6 @@
 objects = require('objects')
 cfg = require('config')
+ai = require('ai')
 
 require('gameboard')
 
@@ -38,9 +39,8 @@ end
 
 function Game:update(dt)
     self.board:update(dt)
-    local power = cfg.POWER
     for i, g in ipairs(self.board.opponents) do
-        g:push( love.math.random(-power, power), love.math.random(-power, power) )
+        ai.manage(g)
     end
     local dude = self.board.guy
     -- ui keys
@@ -53,6 +53,7 @@ function Game:update(dt)
         dude:boost()
         return
     end
+
     -- direction keys, special handling
     local sx, sy = dude.body:getLinearVelocity()
     local impulse = function(d, x, y)
@@ -62,6 +63,8 @@ function Game:update(dt)
             dude:push(x, y)
         end
     end
+
+    local power = cfg.POWER
     if math.abs(sx)+math.abs(sy) < self.max_speed then
         --here we are going to create some keyboard events
         local num_directions = 0

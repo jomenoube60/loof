@@ -75,8 +75,11 @@ function Ball:update(dt)
     if self.player ~= nil then
         if self.body:isActive() then
             self.body:setActive(false)
+        else
+            if self.player.feet[1] == self.player.feet[1] then
+                self.body:setPosition(unpack(self.player.feet))
+            end
         end
-        self.body:setPosition(unpack(self.player.feet))
     else
         if not self.body:isActive() then
             self.body:setActive(true)
@@ -85,17 +88,16 @@ function Ball:update(dt)
 end
 
 function Ball:attach(player)
-    if self.player == player or player ~= nil and player.shot then
-        return
+    if not (self.player == player or player ~= nil and player.shot) then
+        if self.player ~= nil then
+            self.player.ball = nil
+        end
+        if player then
+            player.ball = self
+        end
+        dprint("Ball attached to ", player)
+        self.player = player
     end
-    if self.player ~= nil then
-        self.player.ball = nil
-    end
-    if player then
-        player.ball = self
-    end
-    dprint("Ball attached to ", player)
-    self.player = player
 end
 
 return {

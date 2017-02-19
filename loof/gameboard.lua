@@ -124,7 +124,6 @@ function Board:update(dt)
     local borrowable = self.ball.player ~= nil
     r = r*2 -- make bigger spot
     for i, g in ipairs(self.active_objects) do
-        g:update(dt)
         if borrowable and g:isa(objects.Dude) and g ~= self.ball.player then
             local dx = (g.feet[1] + g.body:getX())/2
             local dy = (g.feet[2] + g.body:getY())/2
@@ -135,6 +134,7 @@ function Board:update(dt)
                 end
             end
         end
+        g:update(dt)
     end
 end
 

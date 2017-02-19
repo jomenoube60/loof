@@ -40,6 +40,7 @@ end
 
 function Game:update(dt)
     self.board:update(dt)
+    ai.step(dt)
     for i, g in ipairs(self.board.opponents) do
         ai.manage(g)
     end

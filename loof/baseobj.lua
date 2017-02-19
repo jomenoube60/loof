@@ -32,9 +32,7 @@ DrawableInterface.x = 0
 DrawableInterface.y = 0
 
 function DrawableInterface:new(body, shape)
-    print(self, body, shape)
     local self = object.new(self)
-    print("=>", self)
     self.body = body
     self.shape = shape or love.physics.newRectangleShape(0, 0, 50, 100)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1) -- A higher density gives it more mass.

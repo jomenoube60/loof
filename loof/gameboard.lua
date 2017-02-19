@@ -97,27 +97,27 @@ function Board:reset_state()
 end
 
 function Board:update(dt)
+    self.world:update(dt)
     if self.goal_marked then
         self.goal_marked = self.goal_marked + dt
         if self.goal_marked > 3 then
             self.goal_marked = nil -- reset game
             self:reset_state()
             ai.clear()
+            return
         end
-        return
     end
-
-    self.world:update(dt)
-
     -- goal detection
     local r = self.ball.radius
     local bx = self.ball.body:getX()
     local by = self.ball.body:getY()
 
-    for i, coords in ipairs(self.goals) do
-        if bx > coords[1] and bx < coords[3] and by > coords[2] and by < coords[4] then
-            game.score[i] = game.score[i] + 1
-            self.goal_marked = 1
+    if not self.goal_marked then
+        for i, coords in ipairs(self.goals) do
+            if bx > coords[1] and bx < coords[3] and by > coords[2] and by < coords[4] then
+                game.score[i] = game.score[i] + 1
+                self.goal_marked = 1
+            end
         end
     end
     -- allow borrowing ball when collisions are not active (w/ player has the ball)

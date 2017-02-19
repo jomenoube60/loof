@@ -24,21 +24,25 @@ function Game:draw()
     self.board:draw()
     local y_offset = 0
     local lines = 10
+    local w = 10 -- width
+    local h = 30 -- height
+    local m = 5 -- margin
+    local s = 2 -- shadow
     -- team 1 score
     for i=1,self.score[2] do
         y_offset = math.floor((i-1)/lines) 
         love.graphics.setColor( 50, 50, 50)
-        love.graphics.rectangle('fill', 15*i-(y_offset*15*lines)+2, 35*y_offset+15+2, 10, 30)
+        love.graphics.rectangle('fill', (w+m)*i-(y_offset*(w+m)*lines)+s, (h+m)*y_offset+w+m+s, w, h)
         love.graphics.setColor( unpack(cfg.colors[1]) )
-        love.graphics.rectangle('fill', 15*i - (y_offset*15*lines), 35*y_offset + 15, 10, 30)
+        love.graphics.rectangle('fill', (w+m)*i - (y_offset*(w+m)*lines), (h+m)*y_offset + (w+m), w, h)
     end
     -- team 2 score
     for i=1,self.score[1] do
         y_offset = math.floor((i-1)/lines) 
         love.graphics.setColor( 50, 50, 50)
-        love.graphics.rectangle('fill', self.board.background.width - 15*i - 13 + (15*y_offset*lines), 35*y_offset+17, 10, 30)
+        love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
         love.graphics.setColor( unpack(cfg.colors[2]) )
-        love.graphics.rectangle('fill', self.board.background.width - 15*i - 15 + (15*y_offset*lines),  35*y_offset+15, 10, 30)
+        love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
     end
 end
 

@@ -3,7 +3,7 @@ objects = require('objects')
 cfg = require('config')
 
 function love.load()
-    game = loof.Game:clone():init()
+    game = loof.Game:new()
 end
 
 persisting = 0

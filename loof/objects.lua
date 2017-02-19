@@ -23,8 +23,8 @@ end
 
 local Edge = baseobj.DrawableInterface:clone()
 
-function Edge:init(body, position)
-    baseobj.DrawableInterface.init(self, body, love.physics.newEdgeShape(unpack(position)))
+function Edge:new(body, position)
+    local self = baseobj.DrawableInterface.new(self, body, love.physics.newEdgeShape(unpack(position)))
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(1)
     return self
@@ -32,9 +32,9 @@ end
 
 local Rectangle = baseobj.DrawableInterface:clone()
 
-function Rectangle:init(body, coords)
+function Rectangle:new(body, coords)
     local co = { coords[1], coords[2], coords[3], coords[2], coords[3], coords[4], coords[1], coords[4] }
-    baseobj.DrawableInterface.init(self, body, love.physics.newPolygonShape(unpack(co)))
+    local self = baseobj.DrawableInterface.new(self, body, love.physics.newPolygonShape(unpack(co)))
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(1)
     return self
@@ -42,8 +42,8 @@ end
 
 local Poly2 = baseobj.DrawableInterface:clone()
 
-function Poly2:init(body, coords)
-    baseobj.DrawableInterface.init(self, body, love.physics.newChainShape(true, unpack(coords)))
+function Poly2:new(body, coords)
+    local self = baseobj.DrawableInterface.new(self, body, love.physics.newChainShape(true, unpack(coords)))
     self.fixture:setRestitution(0.01)
     self.fixture:setFriction(1)
     return self
@@ -51,9 +51,9 @@ end
 
 local Ball = baseobj.DrawableInterface:clone()
 
-function Ball:init(body, opts)
+function Ball:new(body, opts)
     local radius = opts and opts.radius or 10
-    baseobj.DrawableInterface.init(self, body, love.physics.newCircleShape(radius))
+    local self = baseobj.DrawableInterface.new(self, body, love.physics.newCircleShape(radius))
     self.fixture:setUserData("Ball")
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
@@ -62,7 +62,7 @@ function Ball:init(body, opts)
     self.fixture:setFriction(0.2)
     self.body:setLinearDamping(0.3)
     self.fixture:setRestitution(0.9)
-    self.img = baseobj.Sprite:clone():init('ball')
+    self.img = baseobj.Sprite:new('ball')
     return self
 end
 

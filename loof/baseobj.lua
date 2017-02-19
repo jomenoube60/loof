@@ -23,15 +23,18 @@ local function isa( clone_object, base_object )
     return _isa
 end
 
-local object = clone( table, { clone = clone, isa = isa } )
+local object = clone( table, { clone = clone, new = clone, isa = isa } )
 
 local all_drawables = {}
 
-local DrawableInterface = object:clone()
+local DrawableInterface = object:new()
 DrawableInterface.x = 0
 DrawableInterface.y = 0
 
-function DrawableInterface:init(body, shape)
+function DrawableInterface:new(body, shape)
+    print(self, body, shape)
+    local self = object.new(self)
+    print("=>", self)
     self.body = body
     self.shape = shape or love.physics.newRectangleShape(0, 0, 50, 100)
     self.fixture = love.physics.newFixture(self.body, self.shape, 1) -- A higher density gives it more mass.
@@ -53,9 +56,10 @@ function DrawableInterface:reset()
     self.y = 0
 end
 
-local Sprite = object:clone()
+local Sprite = object:new()
 
-function Sprite:init(filename, origin)
+function Sprite:new(filename, origin)
+    local self = object.new(self)
     self.img = love.graphics.newImage('img/' .. filename .. '.png')
     self.width = self.img:getWidth()
     self.height = self.img:getHeight()

@@ -28,13 +28,14 @@ end
 
 Board = objects.object:clone()
 
-function Board:init()
+function Board:new()
+    local self = objects.object.new(self)
     local level = require('levels.' .. cfg.level)
     self.world = love.physics.newWorld(0, 0, true)
     self.world:setCallbacks(beginContact)
 
-    self.background = objects.Sprite:clone():init(level.bg, {0,0} )
-    self.goal_img = objects.Sprite:clone():init('goal', {0,0} )
+    self.background = objects.Sprite:new(level.bg, {0,0} )
+    self.goal_img = objects.Sprite:new('goal', {0,0} )
 
     love.window.setMode(self.background.width, self.background.height)
 
@@ -42,31 +43,31 @@ function Board:init()
     local edges = love.physics.newBody(self.world, 0, 0)
 
     for i, ch in ipairs(level.chains) do
-        objects.Poly2:clone():init(edges, ch)
+        objects.Poly2:new(edges, ch)
     end
     for i, ch in ipairs(level.polygons) do
-        objects.Poly:clone():init(edges, ch)
+        objects.Poly:new(edges, ch)
     end
     for i, ch in ipairs(level.rectangles) do
-        objects.Rectangle:clone():init(edges, ch)
+        objects.Rectangle:new(edges, ch)
     end
     self.goals = level.goals
 
     -- player
-    self.guy = objects.Dude:clone():init( love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
-    self.guy.img = objects.Sprite:clone():init('p1')
+    self.guy = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
+    self.guy.img = objects.Sprite:new('p1')
     self.guy.debug = cfg.DEBUG
     -- computer managed dudes
     self.opponents = {}
 
-    local p2 = objects.Sprite:clone():init('p2')
+    local p2 = objects.Sprite:new('p2')
     for i=1,cfg.DUDES do
-        local d = objects.Dude:clone():init(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={255, 70, 204}})
+        local d = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={255, 70, 204}})
         d.img = p2
         table.insert(self.opponents, d)
     end
 
-    self.ball = objects.Ball:clone():init( love.physics.newBody(self.world, 0, 0, "dynamic") )
+    self.ball = objects.Ball:new( love.physics.newBody(self.world, 0, 0, "dynamic") )
     self.active_objects = {}
     for i, dude in ipairs(self.opponents) do
         table.insert(self.active_objects, dude)

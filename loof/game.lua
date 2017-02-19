@@ -12,9 +12,10 @@ end
 
 Game = objects.object:clone( {max_speed = 20000} )
 
-function Game:init()
+function Game:new()
+    local self = objects.object.clone(self)
     love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
-    self.board = Board:clone():init()
+    self.board = Board:new()
     self.score = {0, 0}
     return self
 end

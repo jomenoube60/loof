@@ -1,12 +1,12 @@
 local baseobj = require('baseobj')
 
 local Dude = baseobj.DrawableInterface:clone()
-Dude.head = baseobj.Sprite:clone():init('pawn')
-Dude.head_slow = baseobj.Sprite:clone():init('pawn_slow')
+Dude.head = baseobj.Sprite:new('pawn')
+Dude.head_slow = baseobj.Sprite:new('pawn_slow')
 
-function Dude:init(body, opts)
+function Dude:new(body, opts)
     local radius = opts and opts.radius or 20
-    baseobj.DrawableInterface.init(self, body, love.physics.newCircleShape(radius)) 
+    local self = baseobj.DrawableInterface.new(self, body, love.physics.newCircleShape(radius)) 
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
     self.boosted = nil

@@ -20,7 +20,7 @@ local function manage(dude)
 
     local g = game.board.goals[1]
     if dude.ball then
-        if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 400 then
+        if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then
             infos.mode = 'togoal'
         else
             infos.mode = 'tofrontgoal'
@@ -39,8 +39,13 @@ local function manage(dude)
                 dude:boost()
             else
                 if managed.have_ball then
-                    s[1] = s[1]*(v/3000)
-                    s[2] = s[2]*(v/3000)
+                    x = game.board.guy.x - dude.x
+                    y = game.board.guy.y - dude.y
+                    s = normalVelocity(x, y)
+                    v = math.abs(x) + math.abs(y)
+                    if v < 100 and not dude.boosted then
+                        dude:boost()
+                    end
                 end
                 dude:push(s[1]*cfg.POWER, s[2]*cfg.POWER)
             end

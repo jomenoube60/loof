@@ -41,7 +41,7 @@ local function manage(dude, dt)
             managed.agressive_cnt = managed.agressive_cnt + 1
         elseif infos.lastmode == nil or infos.lastmode_ts  > mode_duration then -- we don't have ball :'(
             infos.lastmode_ts = 0
-            if managed.toball_cnt > 0 and math.random() < 0.5 or managed.toball_cnt == 0 then -- ensureone agressive, then one to ball
+            if managed.toball_cnt > 0 and (math.random() < 0.5 or managed.toball_cnt == 0) then -- ensureone agressive, then one to ball
                 infos.mode = 'agressive' -- make one agressive, then random
                 managed.agressive_cnt = managed.agressive_cnt + 1
             else

@@ -57,6 +57,7 @@ function Game:new()
     keymanager:register('escape', love.event.quit, 1.0)
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
     keymanager:register('r', function(dt)
+        self.board:reset() -- resets guy, ball & opponents states
         self.board = Board:new()
         self.score = {0, 0}
     end, 3.0)

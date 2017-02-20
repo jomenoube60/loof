@@ -80,7 +80,7 @@ function Dude:draw()
     local x = self.body:getX()+(self.radius*s[1])
     local y = self.body:getY()+(self.radius*s[2])
 
-    if self.slowed_down then
+    if self.slowed_down ~= nil then
         self.head_slow:draw(x, y)
     else
         self.head:draw(x, y)
@@ -124,7 +124,7 @@ function Dude:update(dt)
             self.boosted = nil
         end
     end
-    if self.slowed_down then
+    if self.slowed_down ~= nil then
         self.slowed_down = self.slowed_down + dt
         x = x/2
         y = y/2

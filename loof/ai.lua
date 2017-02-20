@@ -57,7 +57,7 @@ local function manage(dude, dt)
         x, y = dude:distance(game.board.ball)
     else
         local tgt, dist
-        tgt, dist, x, y = dude:targets( g[3], game.board.background.height / 2, 0.3)
+        tgt, dist, x, y = dude:targets( g[3], game.board.background.height / 2, 0.2)
         if tgt and  dist < 600 then
             dude:boost(dt) -- shoot
         end

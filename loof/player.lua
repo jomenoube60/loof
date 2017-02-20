@@ -126,7 +126,7 @@ function Dude:update(dt)
     end
     if self.slowed_down then
         self.slowed_down = self.slowed_down + dt
-        if self.slowed_down > 2 then
+        if self.slowed_down > 1.2 then
             self.slowed_down = nil
             dprint("reset")
         end
@@ -147,6 +147,13 @@ function Dude:push(x, y)
         x = x/2
         y = y/2
     end
+    local sx, sy = self.body:getLinearVelocity()
+    if sx < 0 and x > 0  or sx > 0 and x < 0 then
+        x = x*10
+    elseif sy < 0 and y > 0 or sy > 0 and y < 0 then
+        y = y*10
+    end
+
     self.body:applyForce(x, y)
 end
 

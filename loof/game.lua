@@ -68,11 +68,7 @@ function Game:update(dt)
     -- direction keys, special handling
     local sx, sy = dude.body:getLinearVelocity()
     local function impulse(d, x, y)
-        if d < 0 then
-            dude:push(dt*10*x, dt*10*y)
-        else
-            dude:push(dt*x, dt*y)
-        end
+        dude:push(dt*x, dt*y)
     end
 
     local power = cfg.POWER

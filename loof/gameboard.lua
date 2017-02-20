@@ -74,9 +74,12 @@ function Board:new()
 end
 
 function Board:remove_opponent()
-    table.remove(self.opponents, 1)
-    table.remove(self.active_objects, 1)
+    if #self.opponents > 0 then
+        table.remove(self.opponents, 1)
+        table.remove(self.active_objects, 1)
+    end
 end
+
 function Board:add_opponent(image)
     if image == nil then
         image = objects.Sprite:new('p2')

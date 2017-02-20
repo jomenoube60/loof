@@ -2,6 +2,10 @@ local managed = {}
 
 local function step(dt)
     managed.have_ball = false
+    managed.toball_cnt = 0
+    managed.agressive_cnt = 0
+    managed.tofront_cnt = 0
+    managed.togoal_cnt = 0
     for dude in pairs(managed) do
         if dude.ball then
             managed.have_ball = true
@@ -24,18 +28,23 @@ local function manage(dude, dt)
         if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then
             print("TOGOAL !!")
             infos.mode = 'togoal'
+            managed.togoal_cnt = managed.togoal_cnt + 1
         else
             infos.mode = 'tofrontgoal'
+            managed.togoal_cnt = managed.tofront_cnt + 1
         end
     else
         if managed.have_ball then
             infos.mode = 'agressive'
+            managed.togoal_cnt = managed.agressive_cnt + 1
         elseif infos.lastmode == nil or infos.lastmode_ts  > 3 then
             infos.lastmode_ts = 0
-            if math.random() < 0.5 then
+            if managed.toball_cnt > 0 and math.random() < 0.5 then
                 infos.mode = 'agressive'
+                managed.togoal_cnt = managed.agressive_cnt + 1
             else
                 infos.mode = 'toball'
+                managed.togoal_cnt = managed.toball_cnt + 1
             end
             infos.lastmode = infos.mode
         else

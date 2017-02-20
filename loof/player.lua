@@ -94,7 +94,7 @@ end
 
 function Dude:update(dt)
     local x, y = self.body:getLinearVelocity()
-    if self.pushed then
+    if self.pushed ~= nil then
         if self.pushed == 1 then
             dprint("PUSHED, SHOOTING !!!")
             self:boost(dt)
@@ -133,7 +133,7 @@ function Dude:update(dt)
             dprint("reset")
         end
     end
-    if not self.boosted then
+    if self.boosted ~= nil then
         if x > cfg.MAX_SPEED then
             x = cfg.MAX_SPEED
         elseif y > cfg.MAX_SPEED then

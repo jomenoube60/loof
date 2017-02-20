@@ -87,11 +87,12 @@ function Ball:update(dt)
         end
     end
     local x, y = self.body:getLinearVelocity()
-    if x > cfg.MAX_SPEED then
-        x = cfg.MAX_SPEED
-    elseif y > cfg.MAX_SPEED then
-        y = cfg.MAX_SPEED
+    if x > cfg.MAX_SPEED*cfg.MAX_SPEED then
+        x = cfg.MAX_SPEED*cfg.MAX_SPEED
+    elseif y > cfg.MAX_SPEED * cfg.MAX_SPEED then
+        y = cfg.MAX_SPEED*cfg.MAX_SPEED
     end
+    self.body:getLinearVelocity(x, y)
 end
 
 function Ball:attach(player)

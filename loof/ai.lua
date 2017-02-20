@@ -22,38 +22,40 @@ local function manage(dude, dt)
         }
     end
     local infos = managed[dude]
+    local mode_duration = 3 -- duration of one mode, in seconds
 
     local g = game.board.goals[1]
-    if dude.ball then
-        if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then
-            print("TOGOAL !!")
+    -- find out what mode to apply (kinda state machine)
+    if dude.ball then -- this dude have the ball !!
+        if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then -- when near the goal
             infos.mode = 'togoal'
             managed.togoal_cnt = managed.togoal_cnt + 1
         else
             infos.mode = 'tofrontgoal'
-            managed.togoal_cnt = managed.tofront_cnt + 1
+            managed.tofront_cnt = managed.tofront_cnt + 1
         end
     else
-        if managed.have_ball then
+        -- shuffle time !
+        if managed.have_ball then -- one team guy owns the ball, let's go to the ennemy !
             infos.mode = 'agressive'
-            managed.togoal_cnt = managed.agressive_cnt + 1
-        elseif infos.lastmode == nil or infos.lastmode_ts  > 3 then
+            managed.agressive_cnt = managed.agressive_cnt + 1
+        elseif infos.lastmode == nil or infos.lastmode_ts  > mode_duration then -- we don't have ball :'(
             infos.lastmode_ts = 0
-            if managed.toball_cnt > 0 and math.random() < 0.5 then
-                infos.mode = 'agressive'
-                managed.togoal_cnt = managed.agressive_cnt + 1
+            if managed.toball_cnt > 0 and math.random() < 0.5 or managed.toball_cnt == 0 then -- ensureone agressive, then one to ball
+                infos.mode = 'agressive' -- make one agressive, then random
+                managed.agressive_cnt = managed.agressive_cnt + 1
             else
-                infos.mode = 'toball'
-                managed.togoal_cnt = managed.toball_cnt + 1
+                infos.mode = 'toball' -- if one agressive then one here, then random
+                managed.toball_cnt = managed.toball_cnt + 1
             end
             infos.lastmode = infos.mode
-        else
+        else -- repeat last mode if not elapsed (no shuffle)
             infos.lastmode_ts = infos.lastmode_ts + dt
             infos.mode = infos.lastmode
         end
     end
-    dude.targetting = dude:targets( g[3], game.board.background.height / 2, 0.3)
 
+    -- now apply the behavior according to the chosen mode
     local x, y = nil, nil
 
     if infos.mode == 'agressive' then

@@ -72,6 +72,12 @@ function Game:new()
     keymanager:register('down', function(dt)
         self.board.guy:push(0, cfg.POWER*dt)
     end)
+    keymanager:register('p', function(dt)
+        self.board:add_opponent()
+    end, 1.0)
+    keymanager:register('o', function(dt)
+        self.board:remove_opponent()
+    end, 1.0)
     return self
 end
 

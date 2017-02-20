@@ -50,9 +50,11 @@ end
 
 function Game:new()
     local self = objects.object.new(self)
-    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     self.board = Board:new()
+    love.window.setMode(self.board.background.width, self.board.background.height)
+    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     self.score = {0, 0}
+    self.goal_img = objects.Sprite:new('goal', {0,0} )
     -- register keys
     keymanager:register('escape', love.event.quit, 1.0)
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
@@ -117,6 +119,12 @@ function Game:draw()
         love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
         love.graphics.setColor( unpack(cfg.colors[2]) )
         love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
+    end
+    -- overlays
+    --
+    -- goal
+    if self.board.goal_marked then
+        self.goal_img:draw(0, 0)
     end
 end
 

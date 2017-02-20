@@ -35,9 +35,6 @@ function Board:new()
     self.world:setCallbacks(beginContact)
 
     self.background = objects.Sprite:new(level.bg, {0,0} )
-    self.goal_img = objects.Sprite:new('goal', {0,0} )
-
-    love.window.setMode(self.background.width, self.background.height)
 
     -- build collision elements from level data
     local edges = love.physics.newBody(self.world, 0, 0)
@@ -160,9 +157,6 @@ function Board:draw()
     self.background:draw(0, 0)
     for i, g in ipairs(self.active_objects) do
         g:draw()
-    end
-    if self.goal_marked then
-        self.goal_img:draw(0, 0)
     end
 end
 

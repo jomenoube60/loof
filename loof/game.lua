@@ -60,7 +60,13 @@ function Game:new()
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
     -- register keys
-    keymanager:register('escape', love.event.quit, 1.0, true)
+    keymanager:register('escape', function()
+        if self.menu ~= nil then
+            self.menu = nil
+        else
+            love.event.quit()
+        end
+    end, 0.3, true)
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
     keymanager:register('r', function(dt)
         self.board:reset() -- resets guy, ball & opponents states
@@ -91,7 +97,7 @@ function Game:new()
         else
             self.menu = nil
         end
-    end, 1.0)
+    end, 0.3)
     return self
 end
 

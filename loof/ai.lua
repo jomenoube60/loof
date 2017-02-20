@@ -22,7 +22,6 @@ local function manage(dude, dt)
     local g = game.board.goals[1]
     if dude.ball then
         if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then
-            print("TOGOAL !!")
             infos.mode = 'togoal'
         else
             infos.mode = 'tofrontgoal'

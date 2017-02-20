@@ -10,10 +10,11 @@ local function step(dt)
     end
 end
 
-local function manage(dude)
+local function manage(dude, dt)
     if managed[dude] == nil then
         managed[dude] = {
-            mode = 'toball'
+            mode = 'toball',
+            lastmode_ts = 0,
         }
     end
     local infos = managed[dude]
@@ -21,47 +22,52 @@ local function manage(dude)
     local g = game.board.goals[1]
     if dude.ball then
         if dude.y > g[2] and dude.y < g[4] and dude.x - g[1] < 600 then
+            print("TOGOAL !!")
             infos.mode = 'togoal'
         else
             infos.mode = 'tofrontgoal'
         end
     else
-        infos.mode = 'toball'
+        if managed.have_ball then
+            infos.mode = 'agressive'
+        elseif infos.lastmode == nil or infos.lastmode_ts  > 3 then
+            infos.lastmode_ts = 0
+            if math.random() < 0.5 then
+                infos.mode = 'agressive'
+            else
+                infos.mode = 'toball'
+            end
+            infos.lastmode = infos.mode
+        else
+            infos.lastmode_ts = infos.lastmode_ts + dt
+            infos.mode = infos.lastmode
+        end
+    end
+    dude.targetting = dude:targets( g[3], game.board.background.height / 2, 0.3)
+
+    local x, y = nil, nil
+
+    if infos.mode == 'agressive' then
+        local tgt, dist
+        tgt, dist, x, y = dude:targets(game.board.guy)
+        if not dude.boosted and tgt and dist < 100 then
+            dude:boost(dt)
+        end
+    elseif infos.mode == 'toball' then
+        x, y = dude:distance(game.board.ball)
+    else
+        local tgt, dist
+        tgt, dist, x, y = dude:targets( g[3], game.board.background.height / 2, 0.3)
+        if tgt and  dist < 600 then
+            dude:boost(dt) -- shoot
+        end
     end
 
-    if infos.mode == 'toball' then
-        local x =  game.board.ball.x - dude.x
-        local y =  game.board.ball.y - dude.y
-        local v = math.abs(x) + math.abs(y)
+    if x then
         local s = normalVelocity(x, y)
-        if s[1] == s[1] then
-            if not managed.have_ball and v < 60 then
-                dude:boost()
-            else
-                if managed.have_ball then
-                    x = game.board.guy.x - dude.x
-                    y = game.board.guy.y - dude.y
-                    s = normalVelocity(x, y)
-                    v = math.abs(x) + math.abs(y)
-                    if v < 100 and not dude.boosted then
-                        dude:boost()
-                    end
-                end
-                dude:push(s[1]*cfg.POWER, s[2]*cfg.POWER)
-            end
+        if s and s[1] == s[1] then
+            dude:push(s[1]*dt*cfg.POWER, s[2]*dt*cfg.POWER)
         end
-    elseif infos.mode == 'tofrontgoal' then -- front goal
-        local x = math.min( g[3] + (game.board.background.width / 10) - dude.x, cfg.POWER)
-        local y = math.min( (g[2] + (g[4] - g[2])/2) - dude.y , cfg.POWER)
-        local s = normalVelocity(x, y)
-        dude:push(s[1]*cfg.POWER, s[2]*cfg.POWER)
-        print("front goal", x, y)
-    else -- togoal
-        local g = game.board.goals[1]
-        local x = math.min( g[3] - dude.y - 0.1, cfg.POWER)
-        local y = math.min( (g[2] + (g[4] - g[2])/2) - dude.y , cfg.POWER)
-        dude:push(x, y)
-        print("goal")
     end
 end
 

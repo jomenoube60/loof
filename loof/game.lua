@@ -1,6 +1,7 @@
 objects = require('objects')
 cfg = require('config')
 ai = require('ai')
+see = require('inspect').inspect
 
 require('gameboard')
 
@@ -50,7 +51,7 @@ function Game:update(dt)
     self.board:update(dt)
     ai.step(dt)
     for i, g in ipairs(self.board.opponents) do
-        ai.manage(g)
+        ai.manage(g, dt)
     end
     local dude = self.board.guy
     -- ui keys
@@ -60,17 +61,17 @@ function Game:update(dt)
     end
     -- special keys
     if love.keyboard.isDown("space") then
-        dude:boost()
+        dude:boost(dt)
         return
     end
 
     -- direction keys, special handling
     local sx, sy = dude.body:getLinearVelocity()
-    local impulse = function(d, x, y)
+    local function impulse(d, x, y)
         if d < 0 then
-            dude:push(10*x, 10*y)
+            dude:push(dt*10*x, dt*10*y)
         else
-            dude:push(x, y)
+            dude:push(dt*x, dt*y)
         end
     end
 

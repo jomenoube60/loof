@@ -11,11 +11,14 @@ function Dude:new(body, opts)
     self.radius = radius
     self.boosted = nil
     -- bounce settings
-    self.fixture:setRestitution(0.8)
+    self.body:setBullet(true)
     self.body:setLinearDamping(0.5)
+    self.fixture:setRestitution(0.8)
     self.fixture:setFriction(0.3)
     self.fixture:setUserData('Dude')
     self.feet = {0, 0}
+    self.x = 0
+    self.y = 0
     return self
 end
 
@@ -25,6 +28,34 @@ function Dude:reset()
     self.pushed      = nil
     self.boosted     = nil
     self.slowed_down = nil
+end
+
+function Dude:distance(coords, coord2)
+    if coord2 ~= nil then
+        coords = {coords, coord2}
+    elseif coords[1] == nil then
+        coords = {coords.x, coords.y}
+    end
+    return coords[1]-self.x, coords[2]-self.y
+end
+
+function Dude:targets(coords, coord2, delta)
+    local x, y = self:distance(coords, coord2)
+    local r = normalVelocity(x, y)
+    local sx, sy = self.body:getLinearVelocity()
+    local s = normalVelocity(sx, sy)
+    local ret = false
+
+    if s and s[1] == s[1] then
+--        print('===', delta, math.abs(s[1] - r[1]), math.abs(s[2] - r[2]))
+--        print(see(s))
+--        print(see(r))
+        if math.abs(s[2] - r[2]) + math.abs(s[1] - r[1]) < (delta or 0.1) then
+            ret = true
+        end
+    end
+--    print("RET=",ret)
+    return ret, math.abs(x) + math.abs(y), x, y
 end
 
 function Dude:draw()
@@ -37,6 +68,12 @@ function Dude:draw()
         love.graphics.setColor(unpack(self.color))
         love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius-5)
     end
+    if self.targetting then
+        love.graphics.setColor(0, 255, 0)
+    else
+        love.graphics.setColor(0, 0, 0)
+    end
+--    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
 
     local sx, sy = self.body:getLinearVelocity()
     local s = normalVelocity(sx, sy)
@@ -56,10 +93,11 @@ function Dude:hit()
 end
 
 function Dude:update(dt)
+    local x, y = self.body:getLinearVelocity()
     if self.pushed then
         if self.pushed == 1 then
             dprint("PUSHED, SHOOTING !!!")
-            self:boost()
+            self:boost(dt)
         end
         self.pushed = self.pushed + dt
         if self.pushed > 0.2 then
@@ -93,6 +131,14 @@ function Dude:update(dt)
             dprint("reset")
         end
     end
+    if not self.boosted then
+        if x > cfg.MAX_SPEED then
+            x = cfg.MAX_SPEED
+        elseif y > cfg.MAX_SPEED then
+            y = cfg.MAX_SPEED
+        end
+    end
+    self.body:setLinearVelocity(x, y)
 end
 
 function Dude:push(x, y)
@@ -108,7 +154,7 @@ function Dude:setVelocity(x, y)
     self.body:setLinearVelocity(x, y)
 end
 
-function Dude:boost()
+function Dude:boost(dt)
     local sx, sy = self.body:getLinearVelocity()
     s = normalVelocity(sx, sy)
     if self.ball then
@@ -116,11 +162,12 @@ function Dude:boost()
         self.shot = 1
         dprint("shot = 1")
         ball:attach(nil)
-        ball.body:setLinearVelocity(s[1] * cfg.POWER*2 , s[2]*cfg.POWER*2) 
+        ball.body:setPosition(self.feet[1]+s[1]*self.radius, self.feet[2]+s[2]*self.radius)
+        ball.body:setLinearVelocity(s[1] * cfg.POWER*dt*cfg.BALL_SPEED, s[2]*cfg.POWER*dt*cfg.BALL_SPEED) 
     elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
         dprint("boost !")
         self.boosted = 0.0001
-        self.body:setLinearVelocity((sx+s[1]) * cfg.POWER*0.01 , (sy+s[2])*cfg.POWER*0.01)
+        self.body:setLinearVelocity((sx+s[1]) *cfg.POWER*0.01*dt , (sy+s[2])*cfg.POWER*0.01*dt)
     end
 end
 

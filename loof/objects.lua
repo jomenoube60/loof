@@ -57,11 +57,12 @@ function Ball:new(body, opts)
     self.fixture:setUserData("Ball")
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
-    self.body:setMass(0.1)
     self.fixture:setDensity(0.5)
     self.fixture:setFriction(0.2)
-    self.body:setLinearDamping(0.3)
     self.fixture:setRestitution(0.9)
+    self.body:setLinearDamping(0.3)
+    self.body:setBullet(true)
+    self.body:setMass(0.1)
     self.img = baseobj.Sprite:new('ball')
     return self
 end

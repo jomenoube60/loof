@@ -1,5 +1,7 @@
 return {
-    POWER = 400,
+    POWER = 20000,
+    MAX_SPEED = 200,
+    BALL_SPEED = 3,
     DISTANCE = 30,
     SIZE = 700,
     DEBUG = false,

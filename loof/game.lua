@@ -1,7 +1,12 @@
 objects = require('objects')
 cfg = require('config')
 ai = require('ai')
-see = require('inspect').inspect
+ok, see = pcall(function() return require('inspect').inspect end)
+if not ok then
+    function see(...)
+        print(arg)
+    end
+end
 
 require('gameboard')
 

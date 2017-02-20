@@ -1,14 +1,16 @@
 objects = require('objects')
 cfg = require('config')
+require('gameboard')
 ai = require('ai')
 ok, see = pcall(function() return require('inspect').inspect end)
+Menu = require('menu').Menu
+
 if not ok then
     function see(...)
         print(arg)
     end
 end
 
-require('gameboard')
 
 function dprint(txt)
     if cfg.DEBUG then
@@ -23,7 +25,7 @@ local keymanager = {
     keys = {},
     ts = 0,
 }
-function keymanager:register(key, callable, min_delay)
+function keymanager:register(key, callable, min_delay, in_menu)
     local d = {name=key, fn=callable, interval=min_delay}
     self.keys_by_name[key] = d
     table.insert(self.keys, d)
@@ -37,12 +39,14 @@ end
 function keymanager:manage(dt)
     self.ts = self.ts + dt
     for i, k in ipairs(self.keys) do
-        if love.keyboard.isDown(k.name) then
-            if not self:is_active(k.name) then
-                if k.interval ~= nil then -- if interval defined, store ts
-                    k.ts = self.ts
+        if self.menu == nil or k.in_menu ~= true then
+            if love.keyboard.isDown(k.name) then
+                if not self:is_active(k.name) then
+                    if k.interval ~= nil then -- if interval defined, store ts
+                        k.ts = self.ts
+                    end
+                    k.fn(dt)
                 end
-                k.fn(dt)
             end
         end
     end
@@ -56,7 +60,7 @@ function Game:new()
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
     -- register keys
-    keymanager:register('escape', love.event.quit, 1.0)
+    keymanager:register('escape', love.event.quit, 1.0, true)
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
     keymanager:register('r', function(dt)
         self.board:reset() -- resets guy, ball & opponents states
@@ -81,17 +85,26 @@ function Game:new()
     keymanager:register('o', function(dt)
         self.board:remove_opponent()
     end, 1.0)
+    keymanager:register('m', function(dt)
+        if self.menu == nil then
+            self.menu = Menu:new('menu', {'txt1', 'txt2'})
+        else
+            self.menu = nil
+        end
+    end, 1.0)
     return self
 end
 
 function Game:update(dt)
-    self.board:update(dt)
-    -- update opponents
-    ai.step(dt)
-    for i, g in ipairs(self.board.opponents) do
-        ai.manage(g, dt)
+    if self.menu == nil then
+        self.board:update(dt)
+        -- update opponents
+        ai.step(dt)
+        for i, g in ipairs(self.board.opponents) do
+            ai.manage(g, dt)
+        end
+        -- manage user keys
     end
-    -- manage user keys
     keymanager:manage(dt)
 end
 
@@ -123,6 +136,10 @@ function Game:draw()
     -- overlays
     --
     -- goal
+    if self.menu ~= nil then
+        print("plop")
+        self.menu:draw()
+    end
     if self.board.goal_marked then
         self.goal_img:draw(0, 0)
     end

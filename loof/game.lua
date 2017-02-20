@@ -1,7 +1,12 @@
 objects = require('objects')
 cfg = require('config')
 ai = require('ai')
-see = require('inspect').inspect
+ok, see = pcall(function() return require('inspect').inspect end)
+if not ok then
+    function see(...)
+        print(arg)
+    end
+end
 
 require('gameboard')
 
@@ -11,18 +16,85 @@ function dprint(txt)
     end
 end
 
-Game = objects.object:clone( {max_speed = 20000} )
+Game = objects.object:clone()
+
+local keymanager = {
+    keys_by_name = {},
+    keys = {},
+    ts = 0,
+}
+function keymanager:register(key, callable, min_delay)
+    local d = {name=key, fn=callable, interval=min_delay}
+    self.keys_by_name[key] = d
+    table.insert(self.keys, d)
+end
+
+function keymanager:is_active(key)
+    local k = self.keys_by_name[key]
+    return k.ts ~= nil and k.ts + k.interval > self.ts
+end
+
+function keymanager:manage(dt)
+    self.ts = self.ts + dt
+    for i, k in ipairs(self.keys) do
+        if love.keyboard.isDown(k.name) then
+            if not self:is_active(k.name) then
+                if k.interval ~= nil then -- if interval defined, store ts
+                    k.ts = self.ts
+                end
+                k.fn(dt)
+            end
+        end
+    end
+end
 
 function Game:new()
-    local self = objects.object.clone(self)
+    local self = objects.object.new(self)
     love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     self.board = Board:new()
     self.score = {0, 0}
+    -- register keys
+    keymanager:register('escape', love.event.quit, 1.0)
+    keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
+    keymanager:register('r', function(dt)
+        self.board = Board:new()
+        self.score = {0, 0}
+    end, 3.0)
+    keymanager:register('left', function(dt)
+        self.board.guy:push(-cfg.POWER*dt, 0)
+    end)
+    keymanager:register('right', function(dt)
+        self.board.guy:push(cfg.POWER*dt, 0)
+    end)
+    keymanager:register('up', function(dt)
+        self.board.guy:push(0, -cfg.POWER*dt)
+    end)
+    keymanager:register('down', function(dt)
+        self.board.guy:push(0, cfg.POWER*dt)
+    end)
+    keymanager:register('p', function(dt)
+        self.board:add_opponent()
+    end, 1.0)
+    keymanager:register('o', function(dt)
+        self.board:remove_opponent()
+    end, 1.0)
     return self
+end
+
+function Game:update(dt)
+    self.board:update(dt)
+    -- update opponents
+    ai.step(dt)
+    for i, g in ipairs(self.board.opponents) do
+        ai.manage(g, dt)
+    end
+    -- manage user keys
+    keymanager:manage(dt)
 end
 
 function Game:draw()
     self.board:draw()
+    -- SCORE display
     local y_offset = 0
     local lines = 10
     local w = 10 -- width
@@ -45,54 +117,6 @@ function Game:draw()
         love.graphics.setColor( unpack(cfg.colors[2]) )
         love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
     end
-end
-
-function Game:update(dt)
-    self.board:update(dt)
-    ai.step(dt)
-    for i, g in ipairs(self.board.opponents) do
-        ai.manage(g, dt)
-    end
-    local dude = self.board.guy
-    -- ui keys
-    if love.keyboard.isDown('escape') then
-        love.event.quit()
-        return
-    end
-    -- special keys
-    if love.keyboard.isDown("space") then
-        dude:boost(dt)
-        return
-    end
-
-    -- direction keys, special handling
-    local sx, sy = dude.body:getLinearVelocity()
-    local function impulse(d, x, y)
-        dude:push(dt*x, dt*y)
-    end
-
-    local power = cfg.POWER
-    if math.abs(sx)+math.abs(sy) < self.max_speed then
-        --here we are going to create some keyboard events
-        local num_directions = 0
-        local direction_keys = {
-            left   = function() impulse(-sx, -power, 0) end,
-            right  = function() impulse(sx, power, 0) end,
-            up     = function() impulse(-sy, 0, -power) end,
-            down   = function() impulse(sy, 0, power) end,
-        }
-        local pressed = {} -- store pressed keys to avoid race conditions
-        for x in pairs(direction_keys) do
-            if love.keyboard.isDown(x) then
-                num_directions = num_directions + 1
-                table.insert(pressed, x)
-            end
-        end
-        power = power / num_directions -- power is relative to the number of directions
-        for i, x in ipairs(pressed) do
-            direction_keys[x]()
-        end
-    end 
 end
 
 return {

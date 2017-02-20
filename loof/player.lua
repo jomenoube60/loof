@@ -126,7 +126,9 @@ function Dude:update(dt)
     end
     if self.slowed_down then
         self.slowed_down = self.slowed_down + dt
-        if self.slowed_down > 1.2 then
+        x = x/2
+        y = y/2
+        if self.slowed_down > 1.0 then
             self.slowed_down = nil
             dprint("reset")
         end
@@ -142,11 +144,6 @@ function Dude:update(dt)
 end
 
 function Dude:push(x, y)
-    if self.slowed_down == nil then
-    else
-        x = x/2
-        y = y/2
-    end
     local sx, sy = self.body:getLinearVelocity()
     if sx < 0 and x > 0  or sx > 0 and x < 0 then
         x = x*10
@@ -164,17 +161,19 @@ end
 function Dude:boost(dt)
     local sx, sy = self.body:getLinearVelocity()
     s = normalVelocity(sx, sy)
-    if self.ball then
-        local ball = self.ball
-        self.shot = 1
-        dprint("shot = 1")
-        ball:attach(nil)
-        ball.body:setPosition(self.feet[1]+s[1]*self.radius, self.feet[2]+s[2]*self.radius)
-        ball.body:setLinearVelocity(s[1] * cfg.POWER*dt*cfg.BALL_SPEED, s[2]*cfg.POWER*dt*cfg.BALL_SPEED) 
-    elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
-        dprint("boost !")
-        self.boosted = 0.0001
-        self.body:setLinearVelocity((sx+s[1]) *cfg.POWER*0.01*dt , (sy+s[2])*cfg.POWER*0.01*dt)
+    if s[1] == s[1] then
+        if self.ball then
+            local ball = self.ball
+            self.shot = 1
+            dprint("shot = 1")
+            ball:attach(nil)
+            ball.body:setPosition(self.feet[1]+s[1]*self.radius, self.feet[2]+s[2]*self.radius)
+            ball.body:setLinearVelocity(s[1] * cfg.POWER*dt*cfg.BALL_SPEED, s[2]*cfg.POWER*dt*cfg.BALL_SPEED) 
+        elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
+            dprint("boost !")
+            self.boosted = 0.0001
+            self.body:setLinearVelocity((sx+s[1]) *cfg.POWER*0.01*dt , (sy+s[2])*cfg.POWER*0.01*dt)
+        end
     end
 end
 

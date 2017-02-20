@@ -57,29 +57,47 @@ function Board:new()
     self.guy = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
     self.guy.img = objects.Sprite:new('p1')
     self.guy.debug = cfg.DEBUG
+
     -- computer managed dudes
     self.opponents = {}
+    self.active_objects = {}
 
     local p2 = objects.Sprite:new('p2')
     for i=1,cfg.DUDES do
-        local d = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={255, 70, 204}})
-        d.img = p2
-        table.insert(self.opponents, d)
+        self:add_opponent(p2)
     end
 
-    self.ball = objects.Ball:new( love.physics.newBody(self.world, 0, 0, "dynamic") )
-    self.active_objects = {}
-    for i, dude in ipairs(self.opponents) do
-        table.insert(self.active_objects, dude)
-    end
     table.insert(self.active_objects, self.guy)
+
+    self.ball = objects.Ball:new( love.physics.newBody(self.world, 0, 0, "dynamic") )
     table.insert(self.active_objects, self.ball)
+
     self:reset_state()
     return self
 end
 
+function Board:remove_opponent()
+    table.remove(self.opponents, 1)
+    table.remove(self.active_objects, 1)
+end
+function Board:add_opponent(image)
+    if image == nil then
+        image = objects.Sprite:new('p2')
+    end
+    local d = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={255, 70, 204}})
+    d.img = image
+    table.insert(self.opponents, 1, d)
+    table.insert(self.active_objects, 1, d)
+
+    local op_point = {self.background.width * 3 / 4, self.background.height/2 }
+    local amp = self.background.height / 5
+    d.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
+        op_point[2] + love.math.random(-amp, amp)
+    )
+end
+
 function Board:reset_state()
-    self.guy.body:setPosition( self.background.width / 4, self.background.height/2 )
+    self.guy.body:setPosition( self.background.width / 4 + math.random(-100, 100), self.background.height/2  + math.random(-100, 100))
     self.guy:reset()
 
     self.ball.body:setPosition( self.background.width / 2, self.background.height/2 )
@@ -89,7 +107,7 @@ function Board:reset_state()
     local amp = self.background.height / 5
     for i, op in ipairs(self.opponents) do
         op.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
-        op_point[2] + love.math.random(-amp, amp)
+            op_point[2] + love.math.random(-amp, amp)
         )
         op:reset()
     end
@@ -122,7 +140,7 @@ function Board:update(dt)
     end
     -- allow borrowing ball when collisions are not active (w/ player has the ball)
     local borrowable = self.ball.player ~= nil
-    r = r*2 -- make bigger spot
+    r = r*2 -- make bigger spot, use circle to circle collision
     for i, g in ipairs(self.active_objects) do
         if borrowable and g:isa(objects.Dude) and g ~= self.ball.player then
             local dx = (g.feet[1] + g.body:getX())/2

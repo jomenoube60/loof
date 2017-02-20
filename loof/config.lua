@@ -5,7 +5,7 @@ return {
     DISTANCE = 30,
     SIZE = 700,
     DEBUG = false,
-    DUDES = 3,
+    DUDES = 0,
     level = 'level0',
     colors = {
         {128, 179, 255},

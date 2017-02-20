@@ -16,7 +16,7 @@ function dprint(txt)
     end
 end
 
-Game = objects.object:clone( {max_speed = 20000} )
+Game = objects.object:clone()
 
 local keymanager = {
     keys_by_name = {},
@@ -60,11 +60,35 @@ function Game:new()
         self.board = Board:new()
         self.score = {0, 0}
     end, 3.0)
+    keymanager:register('left', function(dt)
+        self.board.guy:push(-cfg.POWER*dt, 0)
+    end)
+    keymanager:register('right', function(dt)
+        self.board.guy:push(cfg.POWER*dt, 0)
+    end)
+    keymanager:register('up', function(dt)
+        self.board.guy:push(0, -cfg.POWER*dt)
+    end)
+    keymanager:register('down', function(dt)
+        self.board.guy:push(0, cfg.POWER*dt)
+    end)
     return self
+end
+
+function Game:update(dt)
+    self.board:update(dt)
+    -- update opponents
+    ai.step(dt)
+    for i, g in ipairs(self.board.opponents) do
+        ai.manage(g, dt)
+    end
+    -- manage user keys
+    keymanager:manage(dt)
 end
 
 function Game:draw()
     self.board:draw()
+    -- SCORE display
     local y_offset = 0
     local lines = 10
     local w = 10 -- width
@@ -86,39 +110,6 @@ function Game:draw()
         love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
         love.graphics.setColor( unpack(cfg.colors[2]) )
         love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
-    end
-end
-
-function Game:update(dt)
-    self.board:update(dt)
-
-    -- update opponents
-    ai.step(dt)
-    for i, g in ipairs(self.board.opponents) do
-        ai.manage(g, dt)
-    end
-    -- manage user keypresses
-    keymanager:manage(dt)
-
-    local power = cfg.POWER
-    --here we are going to create some keyboard events
-    local direction_keys = {
-        left   = function() self.board.guy:push(-power*dt, 0) end,
-        right  = function() self.board.guy:push(power*dt, 0) end,
-        up     = function() self.board.guy:push(0, -power*dt) end,
-        down   = function() self.board.guy:push(0, power*dt) end,
-    }
-    local pressed = {} -- store pressed keys to avoid race conditions
-    local num_directions = 0
-    for x in pairs(direction_keys) do
-        if love.keyboard.isDown(x) then
-            num_directions = num_directions + 1
-            table.insert(pressed, x)
-        end
-    end
-    power = power / num_directions -- power is relative to the number of directions
-    for i, x in ipairs(pressed) do
-        direction_keys[x]()
     end
 end
 

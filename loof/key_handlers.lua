@@ -1,12 +1,9 @@
 mod = {}
 
 mod.pop_one_level = function()
-    print("Pop!")
     if game.menu ~= nil then
-        print("nil")
         game.menu = nil
     else
-        print("nil menu = quit")
         love.event.quit()
     end
 end

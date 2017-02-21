@@ -63,6 +63,7 @@ function Board:new()
     for i=1,cfg.DUDES do
         self:add_opponent(p2)
     end
+    self.opponents_img = p2
 
     table.insert(self.active_objects, self.guy)
 

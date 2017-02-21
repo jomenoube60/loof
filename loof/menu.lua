@@ -28,7 +28,7 @@ function Menu:new(background, choices)
         local key = k -- curry
         self.keymanager:register(key, function(dt)
             self['handle_' .. self.choices[self.selected]](self, key)
-        end, 0.3)
+        end, 0.2)
     end
 
     self.unselected_pics = objects.object:new()
@@ -67,7 +67,9 @@ end
 
 function MainMenu:draw()
     Menu.draw(self)
-    game:drawbars(#game.board.opponents, cfg.colors[2], 10, 100, false)
+    for i=1,#game.board.opponents do
+        game.board.opponents_img:draw(800 + 50*i, 350)
+    end
 end
 
 MainMenu.handle_Quit = love.event.quit

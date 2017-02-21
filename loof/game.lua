@@ -2,8 +2,9 @@ objects = require('objects')
 cfg = require('config')
 require('gameboard')
 ai = require('ai')
+key_funcs = require('key_handlers')
 ok, see = pcall(function() return require('inspect').inspect end)
-Menu = require('menu').Menu
+require('menu')
 
 if not ok then
     function see(...)
@@ -18,40 +19,8 @@ function dprint(txt)
     end
 end
 
+
 Game = objects.object:clone()
-
-local keymanager = {
-    keys_by_name = {},
-    keys = {},
-    ts = 0,
-}
-function keymanager:register(key, callable, min_delay, in_menu)
-    local d = {name=key, fn=callable, interval=min_delay}
-    self.keys_by_name[key] = d
-    table.insert(self.keys, d)
-end
-
-function keymanager:is_active(key)
-    local k = self.keys_by_name[key]
-    return k.ts ~= nil and k.ts + k.interval > self.ts
-end
-
-function keymanager:manage(dt)
-    self.ts = self.ts + dt
-    for i, k in ipairs(self.keys) do
-        if self.menu == nil or k.in_menu ~= true then
-            if love.keyboard.isDown(k.name) then
-                if not self:is_active(k.name) then
-                    if k.interval ~= nil then -- if interval defined, store ts
-                        k.ts = self.ts
-                    end
-                    k.fn(dt)
-                end
-            end
-        end
-    end
-end
-
 function Game:new()
     local self = objects.object.new(self)
     self.board = Board:new()
@@ -60,13 +29,8 @@ function Game:new()
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
     -- register keys
-    keymanager:register('escape', function()
-        if self.menu ~= nil then
-            self.menu = nil
-        else
-            love.event.quit()
-        end
-    end, 0.3, true)
+    local keymanager = KeyManager:new()
+
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
     keymanager:register('r', function(dt)
         self.board:reset() -- resets guy, ball & opponents states
@@ -85,19 +49,14 @@ function Game:new()
     keymanager:register('down', function(dt)
         self.board.guy:push(0, cfg.POWER*dt)
     end)
-    keymanager:register('p', function(dt)
-        self.board:add_opponent()
-    end, 1.0)
-    keymanager:register('o', function(dt)
-        self.board:remove_opponent()
-    end, 1.0)
-    keymanager:register('m', function(dt)
+    keymanager:register('escape', function(dt)
         if self.menu == nil then
-            self.menu = Menu:new('menu', {'txt1', 'txt2'})
+            self.menu = MainMenu:new()
         else
             self.menu = nil
         end
     end, 0.3)
+    self.keymanager = keymanager
     return self
 end
 
@@ -109,46 +68,61 @@ function Game:update(dt)
         for i, g in ipairs(self.board.opponents) do
             ai.manage(g, dt)
         end
-        -- manage user keys
     end
-    keymanager:manage(dt)
+    -- manage keys
+    if self.menu == nil then
+        self.keymanager:manage(dt)
+    else
+        self.menu.keymanager:manage(dt)
+    end
+end
+
+function Game:drawbars(num, color, m, y_offset, right)
+    local y_offset = y_offset or 0
+    local lines = 10
+    local w = 10 -- width
+    local h = 30 -- height
+    local m = m or 5 -- margin (x)
+    local s = 2 -- shadow
+    if right then -- align right
+        for i=1,self.score[1] do
+            y_offset = math.floor((i-1)/lines) 
+            love.graphics.setColor( 50, 50, 50)
+            love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
+            love.graphics.setColor( unpack(color) )
+            love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
+        end
+    else
+        for i=1,num do
+            y_offset = math.floor((i-1)/lines) 
+            love.graphics.setColor( 50, 50, 50)
+            love.graphics.rectangle('fill', (w+m)*i-(y_offset*(w+m)*lines)+s, (h+m)*y_offset+w+m+s, w, h)
+            love.graphics.setColor( unpack(color) )
+            love.graphics.rectangle('fill', (w+m)*i - (y_offset*(w+m)*lines), (h+m)*y_offset + (w+m), w, h)
+        end
+    end
 end
 
 function Game:draw()
     self.board:draw()
     -- SCORE display
-    local y_offset = 0
-    local lines = 10
-    local w = 10 -- width
-    local h = 30 -- height
-    local m = 5 -- margin
-    local s = 2 -- shadow
-    -- team 1 score
-    for i=1,self.score[2] do
-        y_offset = math.floor((i-1)/lines) 
-        love.graphics.setColor( 50, 50, 50)
-        love.graphics.rectangle('fill', (w+m)*i-(y_offset*(w+m)*lines)+s, (h+m)*y_offset+w+m+s, w, h)
-        love.graphics.setColor( unpack(cfg.colors[1]) )
-        love.graphics.rectangle('fill', (w+m)*i - (y_offset*(w+m)*lines), (h+m)*y_offset + (w+m), w, h)
-    end
-    -- team 2 score
-    for i=1,self.score[1] do
-        y_offset = math.floor((i-1)/lines) 
-        love.graphics.setColor( 50, 50, 50)
-        love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
-        love.graphics.setColor( unpack(cfg.colors[2]) )
-        love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
-    end
+    self:drawbars(self.score[2], cfg.colors[1], 5, 0, false)
+    self:drawbars(self.score[1], cfg.colors[2], 5, 0, true)
     -- overlays
     --
     -- goal
     if self.menu ~= nil then
-        print("plop")
         self.menu:draw()
     end
     if self.board.goal_marked then
         self.goal_img:draw(0, 0)
     end
+end
+
+function Game:reset()
+    self.board:reset_state() -- resets guy, ball & opponents states
+    self.board = Board:new()
+    self.score = {0, 0}
 end
 
 return {

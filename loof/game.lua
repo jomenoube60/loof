@@ -38,17 +38,33 @@ function Game:new()
         self.board = Board:new()
         self.score = {0, 0}
     end, 3.0)
-    keymanager:register('left', function(dt)
-        self.board.guy:push(-cfg.POWER*dt, 0)
+    keymanager:register('left', function(dt, map)
+        if map['top'] or map['down'] then
+            self.board.guy:push(-cfg.POWER*dt*0.7, 0)
+        else
+            self.board.guy:push(-cfg.POWER*dt, 0)
+        end
     end)
-    keymanager:register('right', function(dt)
-        self.board.guy:push(cfg.POWER*dt, 0)
+    keymanager:register('right', function(dt, map)
+        if map['top'] or map['down'] then
+            self.board.guy:push(cfg.POWER*dt*0.7, 0)
+        else
+            self.board.guy:push(cfg.POWER*dt, 0)
+        end
     end)
-    keymanager:register('up', function(dt)
-        self.board.guy:push(0, -cfg.POWER*dt)
+    keymanager:register('up', function(dt, map)
+        if map['left'] or map['right'] then
+            self.board.guy:push(0, -cfg.POWER*dt*0.7)
+        else
+            self.board.guy:push(0, -cfg.POWER*dt)
+        end
     end)
-    keymanager:register('down', function(dt)
-        self.board.guy:push(0, cfg.POWER*dt)
+    keymanager:register('down', function(dt, map)
+        if map['left'] or map['right'] then
+            self.board.guy:push(0, cfg.POWER*dt*0.7)
+        else
+            self.board.guy:push(0, cfg.POWER*dt)
+        end
     end)
     self.keymanager = keymanager
     self.cached_menu = MainMenu:new()

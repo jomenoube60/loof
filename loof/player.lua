@@ -135,9 +135,9 @@ function Dude:update(dt)
     end
     if self.boosted ~= nil then
         if x > cfg.MAX_SPEED then
-            x = cfg.MAX_SPEED
+            x = cfg.MAX_SPEED*0.7
         elseif y > cfg.MAX_SPEED then
-            y = cfg.MAX_SPEED
+            y = cfg.MAX_SPEED*0.7
         end
     end
     self.body:setLinearVelocity(x, y)
@@ -172,7 +172,7 @@ function Dude:boost(dt)
         elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
             dprint("boost !")
             self.boosted = 0.0001
-            self.body:setLinearVelocity((sx+s[1]) *cfg.POWER*0.01*dt , (sy+s[2])*cfg.POWER*0.01*dt)
+            self.body:setLinearVelocity((sx+s[1]) *(cfg.POWER*0.01*dt) , (sy+s[2])*(cfg.POWER*0.01*dt))
         end
     end
 end

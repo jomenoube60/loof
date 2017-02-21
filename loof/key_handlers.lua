@@ -35,14 +35,20 @@ function KeyManager:manage(dt) -- continuous key handling
     end
     self.idle_time = nil
     self.ts = self.ts + dt
+    local pressed = {}
+    for i, k in ipairs(self.keys) do
+        if love.keyboard.isDown(k.name) then
+            pressed[k.name] = true
+        end
+    end
     for i, k in ipairs(self.keys) do
         if self.menu == nil or k.in_menu ~= true then
-            if love.keyboard.isDown(k.name) then
+            if pressed[k.name] then
                 if not self:is_active(k.name) then
                     if k.interval ~= nil then -- if interval defined, store ts
                         k.ts = self.ts
                     end
-                    k.fn(dt)
+                    k.fn(dt, pressed)
                 end
             end
         end

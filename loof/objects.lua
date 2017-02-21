@@ -10,7 +10,7 @@ local player = require('player')
 function normalVelocity(sx, sy)
     local asx = math.abs(sx)
     local asy = math.abs(sy)
-    local fac = 1/(asx + asy)
+    local fac = 1/math.sqrt(asx^2 + asy^2)
     return { sx*fac, sy*fac }
 end
 

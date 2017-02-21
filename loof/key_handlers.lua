@@ -29,7 +29,7 @@ function KeyManager:is_active(key)
     return k.ts ~= nil and k.ts + k.interval > self.ts
 end
 
-function KeyManager:manage(dt)
+function KeyManager:manage(dt) -- continuous key handling
     if self.idle_time ~= nil and self.idle_time > os.time() then
         return
     end

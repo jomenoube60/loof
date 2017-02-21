@@ -12,19 +12,20 @@ if not ok then
     end
 end
 
-
 function dprint(txt)
     if cfg.DEBUG then
         print(txt)
     end
 end
 
-
 Game = objects.object:clone()
 function Game:new()
     local self = objects.object.new(self)
     self.board = Board:new()
-    love.window.setMode(self.board.background.width, self.board.background.height)
+    love.window.setMode(self.board.background.width, self.board.background.height, {
+        fullscreen = true,
+        vsync = true,
+    })
     love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
@@ -49,14 +50,8 @@ function Game:new()
     keymanager:register('down', function(dt)
         self.board.guy:push(0, cfg.POWER*dt)
     end)
-    keymanager:register('escape', function(dt)
-        if self.menu == nil then
-            self.menu = MainMenu:new()
-        else
-            self.menu = nil
-        end
-    end, 0.3)
     self.keymanager = keymanager
+    self.cached_menu = MainMenu:new()
     return self
 end
 
@@ -123,6 +118,24 @@ function Game:reset()
     self.board:reset_state() -- resets guy, ball & opponents states
     self.board = Board:new()
     self.score = {0, 0}
+end
+
+function Game:key_press(key)
+    if key == 'escape' then
+        if self.menu == nil then
+            self.menu = self.cached_menu
+        else
+            self.menu = nil
+        end
+    else
+        if self.menu ~= nil then
+            self.menu:key_press(key)
+        end
+    end
+end
+
+function love.keypressed(key)
+    game:key_press(key)
 end
 
 return {

@@ -6,30 +6,10 @@ function Menu:new(background, choices)
     local self = objects.object.new(self)
     self.background = objects.Sprite:new(background, {0,0} )
     self.choices = choices
+    self.selected = 1
 
     self.keymanager = KeyManager:new()
-    self.keymanager.idle_time = os.time() + 1
-    self.keymanager:register('escape', key_funcs.pop_one_level, 0.5, true)
-    self.keymanager:register('up', function(dt)
-        if self.selected == 1 then
-            self.selected = #self.choices
-        else
-            self.selected = self.selected - 1
-        end
-    end, 0.3)
-    self.keymanager:register('down', function(dt)
-        if self.selected == #self.choices then
-            self.selected = 1
-        else
-            self.selected = self.selected + 1
-        end
-    end, 0.3)
-    for i,k in ipairs({'left', 'right', 'return'}) do -- dynamic keys
-        local key = k -- curry
-        self.keymanager:register(key, function(dt)
-            self['handle_' .. self.choices[self.selected]](self, key)
-        end, 0.2)
-    end
+--    self.keymanager.idle_time = os.time() + 1
 
     self.unselected_pics = objects.object:new()
     for i, choice in ipairs(choices) do
@@ -39,8 +19,27 @@ function Menu:new(background, choices)
     for i, choice in ipairs(choices) do
         self.selected_pics:insert( objects.Sprite:new('menu_' .. choice .. "_sel", {0,0} ))
     end
-    self.selected = 1
     return self
+end
+
+function Menu:key_press(key)
+    if key == 'down' then
+        if self.selected == #self.choices then
+            self.selected = 1
+        else
+            self.selected = self.selected + 1
+        end
+    elseif key == 'up' then
+        if self.selected == 1 then
+            self.selected = #self.choices
+        else
+            self.selected = self.selected - 1
+        end
+    elseif key == 'escape' then
+        key_funcs.pop_one_level()
+    elseif key == 'return' or key == 'right' or key == 'left' then
+        self['handle_' .. self.choices[self.selected]](self, key)
+    end
 end
 
 function Menu:draw()

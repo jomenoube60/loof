@@ -142,7 +142,7 @@ end
 
 function Dude:push(x, y)
     --local sx, sy = self.body:getLinearVelocity()
-    if not self.boosted then
+    if not self.boosted and not self.slowed_down then
       self.body:applyForce(x, y)
     end
 end

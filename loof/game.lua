@@ -33,11 +33,6 @@ function Game:new()
     local keymanager = KeyManager:new()
 
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
-    keymanager:register('r', function(dt)
-        self.board:reset() -- resets guy, ball & opponents states
-        self.board = Board:new()
-        self.score = {0, 0}
-    end, 3.0)
     keymanager:register('left', function(dt, map)
         if map['top'] or map['down'] then
             self.board.guy:push((-cfg.POWER*dt)*0.5, 0)
@@ -68,6 +63,7 @@ function Game:new()
     end)
     self.keymanager = keymanager
     self.cached_menu = MainMenu:new()
+    self.board:reset_state()
     return self
 end
 

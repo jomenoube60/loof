@@ -19,6 +19,11 @@ function KeyManager:new()
     return self
 end
 
+function KeyManager:reset()
+    self.ts = 0
+    self.pressmap = {}
+end
+
 function KeyManager:register(key, callable, min_delay, in_menu)
     local d = {name=key, fn=callable, interval=min_delay}
     self.keys_by_name[key] = d

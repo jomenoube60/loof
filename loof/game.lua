@@ -62,7 +62,9 @@ function Game:new()
         end
     end)
     self.keymanager = keymanager
+    self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
+    self.menu = self.cached_menu
     self.board:reset_state()
     return self
 end
@@ -131,6 +133,7 @@ end
 function Game:reset()
     self.board:reset_state() -- resets guy, ball & opponents states
     self.board = Board:new()
+    self.active_keymanager:reset()
     self.score = {0, 0}
 end
 

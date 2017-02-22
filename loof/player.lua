@@ -11,7 +11,7 @@ function Dude:new(body, opts)
     self.radius = radius
     self.boosted = nil
     -- bounce settings
-    self.body:setMass(3)
+    self.body:setMass(2)
     self.body:setBullet(true)
     self.body:setLinearDamping(0.9)
     self.fixture:setRestitution(0.8)
@@ -132,7 +132,7 @@ function Dude:update(dt)
         self.slowed_down = self.slowed_down + dt
         x = x/2
         y = y/2
-        if self.slowed_down > 1.0 then
+        if self.slowed_down > 0.5 then
             self.slowed_down = nil
             dprint("reset")
         end
@@ -141,7 +141,6 @@ function Dude:update(dt)
 end
 
 function Dude:push(x, y)
-    --local sx, sy = self.body:getLinearVelocity()
     if not self.boosted and not self.slowed_down then
       self.body:applyForce(x, y)
     end
@@ -165,7 +164,6 @@ function Dude:boost(dt)
             local asy = math.abs(sy)
             coef = 1/math.sqrt( asx^2 + asy^2)
             self.body:setLinearVelocity(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
---            coef*cfg.POWER*10*dt , sy*coef*cfg.POWER*10*dt)
         end
     end
 end

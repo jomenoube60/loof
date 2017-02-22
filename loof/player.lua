@@ -164,7 +164,7 @@ function Dude:boost(dt)
             local asx = math.abs(sx)
             local asy = math.abs(sy)
             coef = 1/math.sqrt( asx^2 + asy^2)
-            self.body:setLinearVelocity(0.5*s[1]*cfg.POWER*dt, 0.5*s[2]*cfg.POWER*dt)
+            self.body:setLinearVelocity(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
 --            coef*cfg.POWER*10*dt , sy*coef*cfg.POWER*10*dt)
         end
     end

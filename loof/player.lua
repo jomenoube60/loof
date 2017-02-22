@@ -11,8 +11,9 @@ function Dude:new(body, opts)
     self.radius = radius
     self.boosted = nil
     -- bounce settings
+    self.body:setMass(3)
     self.body:setBullet(true)
-    self.body:setLinearDamping(0.5)
+    self.body:setLinearDamping(0.9)
     self.fixture:setRestitution(0.8)
     self.fixture:setFriction(0.3)
     self.fixture:setUserData('Dude')
@@ -20,6 +21,13 @@ function Dude:new(body, opts)
     self.x = 0
     self.y = 0
     return self
+end
+
+function Dude:destroy()
+    self.fixture:destroy()
+    self.body:destroy()
+    self.body = nil
+    self.fixture = nil
 end
 
 function Dude:reset()
@@ -47,14 +55,10 @@ function Dude:targets(coords, coord2, delta)
     local ret = false
 
     if s and s[1] == s[1] then
---        print('===', delta, math.abs(s[1] - r[1]), math.abs(s[2] - r[2]))
---        print(see(s))
---        print(see(r))
         if math.abs(s[2] - r[2]) + math.abs(s[1] - r[1]) < (delta or 0.1) then
             ret = true
         end
     end
---    print("RET=",ret)
     return ret, math.abs(x) + math.abs(y), x, y
 end
 
@@ -133,29 +137,14 @@ function Dude:update(dt)
             dprint("reset")
         end
     end
-    if self.boosted ~= nil then
-        if x > cfg.MAX_SPEED then
-            x = cfg.MAX_SPEED*0.7
-        elseif y > cfg.MAX_SPEED then
-            y = cfg.MAX_SPEED*0.7
-        end
-    end
     self.body:setLinearVelocity(x, y)
 end
 
 function Dude:push(x, y)
-    local sx, sy = self.body:getLinearVelocity()
-    if sx < 0 and x > 0  or sx > 0 and x < 0 then
-        x = x*10
-    elseif sy < 0 and y > 0 or sy > 0 and y < 0 then
-        y = y*10
+    --local sx, sy = self.body:getLinearVelocity()
+    if not self.boosted then
+      self.body:applyForce(x, y)
     end
-
-    self.body:applyForce(x, y)
-end
-
-function Dude:setVelocity(x, y)
-    self.body:setLinearVelocity(x, y)
 end
 
 function Dude:boost(dt)
@@ -168,11 +157,15 @@ function Dude:boost(dt)
             dprint("shot = 1")
             ball:attach(nil)
             ball.body:setPosition(self.feet[1]+s[1]*self.radius, self.feet[2]+s[2]*self.radius)
-            ball.body:setLinearVelocity(s[1] * cfg.POWER*dt*cfg.BALL_SPEED, s[2]*cfg.POWER*dt*cfg.BALL_SPEED) 
+            ball.body:setLinearVelocity(s[1] * cfg.BALL_SPEED, s[2]*cfg.BALL_SPEED) 
         elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
             dprint("boost !")
             self.boosted = 0.0001
-            self.body:setLinearVelocity((sx+s[1]) *(cfg.POWER*0.01*dt) , (sy+s[2])*(cfg.POWER*0.01*dt))
+            local asx = math.abs(sx)
+            local asy = math.abs(sy)
+            coef = 1/math.sqrt( asx^2 + asy^2)
+            self.body:setLinearVelocity(0.5*s[1]*cfg.POWER*dt, 0.5*s[2]*cfg.POWER*dt)
+--            coef*cfg.POWER*10*dt , sy*coef*cfg.POWER*10*dt)
         end
     end
 end

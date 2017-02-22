@@ -57,12 +57,12 @@ function Ball:new(body, opts)
     self.fixture:setUserData("Ball")
     self.color = opts and opts.color or {0, 0, 0}
     self.radius = radius
-    self.fixture:setDensity(0.5)
-    self.fixture:setFriction(0.2)
+--    self.fixture:setDensity(1.0)
+    -- self.fixture:setFriction(99)
     self.fixture:setRestitution(0.9)
-    self.body:setLinearDamping(0.3)
+    self.body:setLinearDamping(0.2)
     self.body:setBullet(true)
-    self.body:setMass(0.1)
+    self.body:setMass(0.2)
     self.img = baseobj.Sprite:new('ball')
     return self
 end
@@ -86,13 +86,6 @@ function Ball:update(dt)
             self.body:setActive(true)
         end
     end
-    local x, y = self.body:getLinearVelocity()
-    if x > cfg.MAX_SPEED*cfg.MAX_SPEED then
-        x = cfg.MAX_SPEED*cfg.MAX_SPEED
-    elseif y > cfg.MAX_SPEED * cfg.MAX_SPEED then
-        y = cfg.MAX_SPEED*cfg.MAX_SPEED
-    end
-    self.body:getLinearVelocity(x, y)
 end
 
 function Ball:attach(player)

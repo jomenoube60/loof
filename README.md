@@ -8,3 +8,4 @@
 
 - make mini collision library to mutualise code
 - "cook"/cache dynamic objects variables to not re-compute
+- fix boost speed

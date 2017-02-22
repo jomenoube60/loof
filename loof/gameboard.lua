@@ -1,6 +1,6 @@
 local ai = require('ai')
 
-function beginContact(a, b, coll) -- collision handling
+function solve_collision(a, b, coll) -- collision handling
     local player = nil
     local ball = nil
 
@@ -14,7 +14,6 @@ function beginContact(a, b, coll) -- collision handling
         ball = b
         player = a
     elseif b:isa(objects.Dude) and a:isa(objects.Dude) then
-        dprint("Dude <> Dude collision")
         if b.boosted or b.pushed then
             a:hit()
         elseif a.boosted or a.pushed then
@@ -32,7 +31,7 @@ function Board:new()
     local self = objects.object.new(self)
     local level = require('levels.' .. cfg.level)
     self.world = love.physics.newWorld(0, 0, true)
-    self.world:setCallbacks(beginContact)
+    self.world:setCallbacks(nil, nil, solve_collision)
 
     self.background = objects.Sprite:new(level.bg, {0,0} )
 
@@ -76,8 +75,10 @@ end
 
 function Board:remove_opponent()
     if #self.opponents > 0 then
+        local dead = self.opponents[1]
         table.remove(self.opponents, 1)
         table.remove(self.active_objects, 1)
+        dead:destroy()
     end
 end
 
@@ -148,7 +149,6 @@ function Board:update(dt)
             local dy = (g.feet[2] + g.body:getY())/2
             if dx - r < bx and  dx + r > bx  and dy - r < by and dy + r > by then
                 if self.ball.player ~= g then
-                    dprint("Ball changes from " , self.ball.player , " to " , g)
                     self.ball:attach(g)
                 end
             end

@@ -1,9 +1,8 @@
 return {
-    POWER = 20000,
-    MAX_SPEED = 200,
-    BALL_SPEED = 3,
-    DISTANCE = 30,
-    SIZE = 700,
+    POWER = 60000,
+    MAX_SPEED = 10000000,
+    BALL_SPEED = 1000,
+    DISTANCE = 90,
     DEBUG = false,
     DUDES = 3,
     level = 'level0',

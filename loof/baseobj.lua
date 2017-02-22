@@ -41,8 +41,10 @@ function DrawableInterface:new(body, shape)
 end
 
 function DrawableInterface:draw()
-    self.x = self.body:getX()
-    self.y = self.body:getY()
+    if self.body then
+        self.x = self.body:getX()
+        self.y = self.body:getY()
+    end
 end
 
 function DrawableInterface:update()

@@ -40,28 +40,28 @@ function Game:new()
     end, 3.0)
     keymanager:register('left', function(dt, map)
         if map['top'] or map['down'] then
-            self.board.guy:push(-cfg.POWER*dt*0.7, 0)
+            self.board.guy:push((-cfg.POWER*dt)*0.5, 0)
         else
             self.board.guy:push(-cfg.POWER*dt, 0)
         end
     end)
     keymanager:register('right', function(dt, map)
         if map['top'] or map['down'] then
-            self.board.guy:push(cfg.POWER*dt*0.7, 0)
+            self.board.guy:push((cfg.POWER*dt)*0.5, 0)
         else
             self.board.guy:push(cfg.POWER*dt, 0)
         end
     end)
     keymanager:register('up', function(dt, map)
         if map['left'] or map['right'] then
-            self.board.guy:push(0, -cfg.POWER*dt*0.7)
+            self.board.guy:push(0, (-cfg.POWER*dt)*0.5)
         else
             self.board.guy:push(0, -cfg.POWER*dt)
         end
     end)
     keymanager:register('down', function(dt, map)
         if map['left'] or map['right'] then
-            self.board.guy:push(0, cfg.POWER*dt*0.7)
+            self.board.guy:push(0, (cfg.POWER*dt)*0.5)
         else
             self.board.guy:push(0, cfg.POWER*dt)
         end
@@ -82,8 +82,10 @@ function Game:update(dt)
     end
     -- manage keys
     if self.menu == nil then
+      self.active_keymanager = self.keymanager
         self.keymanager:manage(dt)
     else
+      self.active_keymanager = self.menu.keymanager
         self.menu.keymanager:manage(dt)
     end
 end
@@ -151,9 +153,18 @@ function Game:key_press(key)
 end
 
 function love.keypressed(key)
-    game:key_press(key)
+  if game.active_keymanager then
+      game.active_keymanager:keypressed(key)
+  end
+  game:key_press(key)
 end
 
+
+function love.keyreleased(key)
+  if game.active_keymanager then
+    game.active_keymanager:keyreleased(key)
+    end
+end
 return {
     Game = Game
 }

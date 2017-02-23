@@ -67,7 +67,7 @@ end
 function MainMenu:draw()
     Menu.draw(self)
     for i=1,#game.board.opponents do
-        game.board.opponents_img:draw(800 + 50*i, 350)
+        game.board.opponents_img:draw(640 + 50*i, 380)
     end
 end
 

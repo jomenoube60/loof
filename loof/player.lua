@@ -2,7 +2,6 @@ local baseobj = require('baseobj')
 
 local Dude = baseobj.DrawableInterface:clone()
 Dude.head = baseobj.Sprite:new('pawn')
-Dude.head_slow = baseobj.Sprite:new('pawn_slow')
 
 function Dude:new(body, opts)
     local radius = opts and opts.radius or 20
@@ -84,11 +83,7 @@ function Dude:draw()
     local x = self.body:getX()+(self.radius*s[1])
     local y = self.body:getY()+(self.radius*s[2])
 
-    if self.slowed_down ~= nil then
-        self.head_slow:draw(x, y)
-    else
-        self.head:draw(x, y)
-    end
+    self.head:draw(x, y)
     self.feet = {x, y}
 end
 

@@ -56,6 +56,30 @@ function DrawableInterface:reset()
     self.y = 0
 end
 
+function DrawableInterface:distance(coords, coord2) -- returns the x,y distance from this coordinates
+    if coord2 ~= nil then
+        coords = {coords, coord2}
+    elseif coords[1] == nil then
+        coords = {coords.x, coords.y}
+    end
+    return coords[1]-self.x, coords[2]-self.y
+end
+
+function DrawableInterface:targets(coords, coord2, delta) -- returns true if targetting this coordinate
+    local x, y = self:distance(coords, coord2)
+    local r = normalVelocity(x, y)
+    local sx, sy = self.body:getLinearVelocity()
+    local s = normalVelocity(sx, sy)
+    local ret = false
+
+    if s and s[1] == s[1] then
+        if math.abs(s[2] - r[2]) + math.abs(s[1] - r[1]) < (delta or 0.1) then
+            ret = true
+        end
+    end
+    return ret, math.abs(x) + math.abs(y), x, y
+end
+
 local Sprite = object:new()
 
 function Sprite:new(filename, origin)

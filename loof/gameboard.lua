@@ -31,7 +31,7 @@ function Board:new()
     local self = objects.object.new(self)
     local level = require('levels.' .. cfg.level)
     self.world = love.physics.newWorld(0, 0, true)
-    self.world:setCallbacks(nil, nil, solve_collision)
+    self.world:setCallbacks(solve_collision)
 
     self.background = objects.Sprite:new(level.bg, {0,0} )
 
@@ -142,17 +142,14 @@ function Board:update(dt)
             end
         end
     end
-    -- allow borrowing ball when collisions are not active (w/ player has the ball)
-    local borrowable = self.ball.player ~= nil
+    
     r = r*2 -- make bigger spot, use circle to circle collision
     for i, g in ipairs(self.active_objects) do
-        if borrowable and g:isa(objects.Dude) and g ~= self.ball.player then
+        if g:isa(objects.Dude) and g ~= self.ball.player then -- if dude without a ball
             local dx = (g.feet[1] + g.body:getX())/2
             local dy = (g.feet[2] + g.body:getY())/2
             if dx - r < bx and  dx + r > bx  and dy - r < by and dy + r > by then
-                if self.ball.player ~= g then
-                    self.ball:attach(g)
-                end
+                self.ball:attach(g)
             end
         end
         g:update(dt)

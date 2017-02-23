@@ -29,7 +29,14 @@ function love.keypressed(key)
   game:key_press(key)
 end
 
+--[[
 function love.mousepressed(x, y)
+    print("mouse",x,y)
+    game:mousepressed(x, y)
+end
+]]
+
+function love.touchpressed(id, x, y, dx, dy, pressure)
     game:mousepressed(x, y)
 end
 

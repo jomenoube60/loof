@@ -26,3 +26,5 @@ cat /bin/love loof.love > $D/loof
 chmod +x $D/loof
 zip -9r $D.zip $D
 rm -fr $D
+
+scp *.zip planet:www/vrac/love/

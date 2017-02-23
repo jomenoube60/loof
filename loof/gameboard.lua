@@ -130,7 +130,6 @@ function Board:update(dt)
         end
     end
     -- goal detection
-    local r = self.ball.radius
     local bx = self.ball.body:getX()
     local by = self.ball.body:getY()
 
@@ -143,12 +142,13 @@ function Board:update(dt)
         end
     end
     
-    r = r*2 -- make bigger spot, use circle to circle collision
+    local found = nil
     for i, g in ipairs(self.active_objects) do
-        if g:isa(objects.Dude) and g ~= self.ball.player then -- if dude without a ball
+        if not found and g:isa(objects.Dude) and g ~= self.ball.player then -- if dude without a ball
             local x, y, dist = self.ball:distance(unpack(g.feet))
-            if dist - g.radius - self.ball.radius <= 0 then
-                self.ball:attach(g)
+            if dist - g.radius - self.ball.radius - 10 <= 0 then
+                self.ball:attach(nil)
+                found = true
             end
         end
         g:update(dt)

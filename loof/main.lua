@@ -2,7 +2,7 @@ loof = require('game')
 objects = require('objects')
 cfg = require('config')
 
-joysticks = {}
+joysticks = objects.object:new()
 
 function love.load()
     game = loof.Game:new()
@@ -19,7 +19,7 @@ end
 
 function love.joystickadded(joystick)
     p1joystick = joystick
-    joysticks.insert(p1joystick)
+    joysticks:insert(p1joystick)
 end
 
 function love.keypressed(key)

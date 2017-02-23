@@ -21,7 +21,7 @@ end
 Game = objects.object:clone()
 function Game:new()
     local self = objects.object.new(self)
-    self.board = Board:new()
+    self:reset()
     love.window.setMode(self.board.background.width, self.board.background.height, {
         fullscreen = true,
         vsync = true,
@@ -65,7 +65,6 @@ function Game:new()
     self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
     self.menu = self.cached_menu
-    self.board:reset_state()
     return self
 end
 
@@ -81,8 +80,23 @@ function Game:update(dt)
     -- manage keys
     if self.menu == nil then
       self.active_keymanager = self.keymanager
-        self.keymanager:manage(dt)
-    else
+      -- general keys
+      self.keymanager:manage(dt)
+      -- joypad
+      if #joysticks > 0 then
+          if p1joystick:isDown(1) then
+              self.board.guy:boost(dt)
+          end
+          self.board.guy:push(p1joystick:getGamepadAxis("leftx")*cfg.POWER*dt, p1joystick:getGamepadAxis("lefty")*cfg.POWER*dt)
+      end
+      -- mouse
+      local mx, my = love.mouse.getPosition()
+      if not (mx == 0 and my == 0) then
+          local sx, sy = self.board.guy:distance(mx, my)
+          local s = normalVelocity(sx, sy)
+          self.board.guy:push(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
+      end
+    else -- submenu keys
       self.active_keymanager = self.menu.keymanager
         self.menu.keymanager:manage(dt)
     end
@@ -131,9 +145,13 @@ function Game:draw()
 end
 
 function Game:reset()
-    self.board:reset_state() -- resets guy, ball & opponents states
+    if self.board then
+        self.board:reset_state() -- resets guy, ball & opponents states
+    end
     self.board = Board:new()
-    self.active_keymanager:reset()
+    if self.active_keymanager then
+        self.active_keymanager:reset()
+    end
     self.score = {0, 0}
 end
 
@@ -151,19 +169,10 @@ function Game:key_press(key)
     end
 end
 
-function love.keypressed(key)
-  if game.active_keymanager then
-      game.active_keymanager:keypressed(key)
-  end
-  game:key_press(key)
+function Game:mousepressed(x, y)
+    self.board.guy:boost()
 end
 
-
-function love.keyreleased(key)
-  if game.active_keymanager then
-    game.active_keymanager:keyreleased(key)
-    end
-end
 return {
     Game = Game
 }

@@ -60,14 +60,14 @@ end
 MainMenu = Menu:clone()
 
 function MainMenu:new()
-    local self = Menu.new(self, 'menu', {'Resume', 'NewGame', 'Ennemies', 'Quit'})
+    local self = Menu.new(self, 'menu', {'NewGame', 'Enemies', 'Quit'})
     return self
 end
 
 function MainMenu:draw()
     Menu.draw(self)
     for i=1,#game.board.opponents do
-        game.board.opponents_img:draw(640 + 50*i, 380)
+        game.board.opponents_img:draw(640 + 50*i, 280)
     end
 end
 
@@ -76,9 +76,10 @@ MainMenu.handle_Resume = key_funcs.pop_one_level
 
 function MainMenu:handle_NewGame(from)
     game:reset()
+    key_funcs.pop_one_level()
 end
 
-function MainMenu:handle_Ennemies(from)
+function MainMenu:handle_Enemies(from)
     if from == 'right' then
         game.board:add_opponent()
     elseif from == 'left' then

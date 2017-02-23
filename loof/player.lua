@@ -76,14 +76,14 @@ function Dude:draw()
     else
         love.graphics.setColor(0, 0, 0)
     end
---    love.graphics.circle("fill", self.body:getX(), self.body:getY(), self.radius)
+
+    self.head:draw(unpack(self.feet))
 
     local sx, sy = self.body:getLinearVelocity()
     local s = normalVelocity(sx, sy)
     local x = self.body:getX()+(self.radius*s[1])
     local y = self.body:getY()+(self.radius*s[2])
 
-    self.head:draw(x, y)
     self.feet = {x, y}
 end
 

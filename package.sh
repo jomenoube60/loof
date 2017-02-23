@@ -1,4 +1,7 @@
 #!/bin/sh
+
+rm -fr *.zip
+
 cd loof
 find . -name "*.orig" -exec rm {} \;
 find . -name "*.sw?" -exec rm {} \;

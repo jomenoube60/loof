@@ -79,12 +79,14 @@ function Board:remove_opponent()
         table.remove(self.opponents, 1)
         table.remove(self.active_objects, 1)
         dead:destroy()
+        cfg.DUDES = cfg.DUDES - 1
     end
 end
 
 function Board:add_opponent(image)
     if image == nil then
         image = objects.Sprite:new('p2')
+        cfg.DUDES = cfg.DUDES + 1
     end
     local d = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={255, 70, 204}})
     d.img = image

@@ -21,12 +21,12 @@ end
 Game = objects.object:clone()
 function Game:new()
     local self = objects.object.new(self)
-    self:reset()
+    self.board = Board:new()
+    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     love.window.setMode(self.board.background.width, self.board.background.height, {
         fullscreen = true,
         vsync = true,
     })
-    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
     -- register keys
@@ -65,6 +65,7 @@ function Game:new()
     self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
     self.menu = self.cached_menu
+
     return self
 end
 
@@ -136,11 +137,12 @@ function Game:draw()
     -- overlays
     --
     -- goal
-    if self.menu ~= nil then
-        self.menu:draw()
-    end
     if self.board.goal_marked then
         self.goal_img:draw(0, 0)
+    end
+    -- menu
+    if self.menu ~= nil then
+        self.menu:draw()
     end
 end
 

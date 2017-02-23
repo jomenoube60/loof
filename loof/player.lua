@@ -37,7 +37,7 @@ function Dude:reset()
     self.slowed_down = nil
 end
 
-function Dude:distance(coords, coord2)
+function Dude:distance(coords, coord2) -- returns the x,y distance from this coordinates
     if coord2 ~= nil then
         coords = {coords, coord2}
     elseif coords[1] == nil then
@@ -46,7 +46,7 @@ function Dude:distance(coords, coord2)
     return coords[1]-self.x, coords[2]-self.y
 end
 
-function Dude:targets(coords, coord2, delta)
+function Dude:targets(coords, coord2, delta) -- returns true if targetting this coordinate
     local x, y = self:distance(coords, coord2)
     local r = normalVelocity(x, y)
     local sx, sy = self.body:getLinearVelocity()
@@ -87,7 +87,7 @@ function Dude:draw()
     self.feet = {x, y}
 end
 
-function Dude:hit()
+function Dude:hit() -- dude is pushed by someone
     self.pushed = 1
 end
 
@@ -137,13 +137,13 @@ function Dude:update(dt)
     self.body:setLinearVelocity(x, y)
 end
 
-function Dude:push(x, y)
+function Dude:push(x, y) -- make the dude move
     if not self.boosted and not self.slowed_down then
       self.body:applyForce(x, y)
     end
 end
 
-function Dude:boost(dt)
+function Dude:boost(dt) -- boost button pressed
     local sx, sy = self.body:getLinearVelocity()
     s = normalVelocity(sx, sy)
     if s[1] == s[1] then

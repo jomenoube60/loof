@@ -126,6 +126,7 @@ function Dude:update(dt)
         if self.boosted >= 0.2 then
             self.slowed_down = self.boosted
             self.boosted = nil
+            self.last_boost = os.time()
         end
     end
     if self.slowed_down ~= nil then
@@ -159,11 +160,13 @@ function Dude:boost(dt)
             ball.body:setLinearVelocity(s[1] * cfg.BALL_SPEED, s[2]*cfg.BALL_SPEED) 
         elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
             dprint("boost !")
-            self.boosted = 0.0001
-            local asx = math.abs(sx)
-            local asy = math.abs(sy)
-            coef = 1/math.sqrt( asx^2 + asy^2)
-            self.body:setLinearVelocity(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
+            if not self.last_boost or os.time() - self.last_boost > 2 then
+                self.boosted = 0.0001
+                local asx = math.abs(sx)
+                local asy = math.abs(sy)
+                coef = 1/math.sqrt( asx^2 + asy^2)
+                self.body:setLinearVelocity(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
+            end
         end
     end
 end

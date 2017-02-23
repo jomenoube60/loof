@@ -64,6 +64,7 @@ function Game:new()
     self.keymanager = keymanager
     self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
+    self:reset()
     self.menu = self.cached_menu
 
     return self

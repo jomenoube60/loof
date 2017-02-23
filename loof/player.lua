@@ -99,9 +99,6 @@ function Dude:update(dt)
             self:boost(dt)
         end
         self.pushed = self.pushed + dt
-        if self.pushed > 0.2 then
-            self.pushed = nil
-        end
     end
     if self.shot ~= nil then
         self.shot = self.shot + dt
@@ -119,9 +116,13 @@ function Dude:update(dt)
             end
         end
         if self.boosted >= 0.2 then
-            self.slowed_down = self.boosted
+            if self.pushed then
+                self.pushed = nil
+            else
+                self.slowed_down = self.boosted
+                self.last_boost = os.time()
+            end
             self.boosted = nil
-            self.last_boost = os.time()
         end
     end
     if self.slowed_down ~= nil then

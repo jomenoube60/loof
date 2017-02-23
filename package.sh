@@ -38,4 +38,4 @@ cp Info.plist Loof.app/Contents/Info.plist
 cp loof.love Loof.app/Contents/Resources/Loof.love
 zip -9ry $D.zip Loof.app
 
-scp *.zip planet:www/vrac/love/
+scp *.zip planet:www/loof/pkg/

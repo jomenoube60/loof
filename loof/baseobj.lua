@@ -62,7 +62,9 @@ function DrawableInterface:distance(coords, coord2) -- returns the x,y distance 
     elseif coords[1] == nil then
         coords = {coords.x, coords.y}
     end
-    return coords[1]-self.x, coords[2]-self.y
+    local x = coords[1]-self.x
+    local y = coords[2]-self.y
+    return x, y, math.sqrt(x^2 + y^2)
 end
 
 function DrawableInterface:targets(coords, coord2, delta) -- returns true if targetting this coordinate

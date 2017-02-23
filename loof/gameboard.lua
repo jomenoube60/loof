@@ -146,9 +146,8 @@ function Board:update(dt)
     r = r*2 -- make bigger spot, use circle to circle collision
     for i, g in ipairs(self.active_objects) do
         if g:isa(objects.Dude) and g ~= self.ball.player then -- if dude without a ball
-            local dx = (g.feet[1] + g.body:getX())/2
-            local dy = (g.feet[2] + g.body:getY())/2
-            if dx - r < bx and  dx + r > bx  and dy - r < by and dy + r > by then
+            local x, y, dist = self.ball:distance(unpack(g.feet))
+            if dist - g.radius - self.ball.radius <= 0 then
                 self.ball:attach(g)
             end
         end

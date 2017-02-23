@@ -8,9 +8,21 @@ cd ..
 cat /bin/love loof.love > loof_lnx
 chmod +x loof_lnx
 
-mkdir loof_win32
-cp -r love*win*/*.dll loof_win32/
-cat love*win*/love.exe loof.love > loof_win32/loof.exe
+pkg='windows64'
 
-zip -9r loof-win32.zip loof_win32
-rm -fr loof_win32
+D="loof-$pkg"
+mkdir $D
+cp -r love*win*/*.dll $D
+cat love*win*/love.exe loof.love > $D/loof.exe
+zip -9r $D.zip $D
+rm -fr $D
+
+pkg='linux64'
+
+D="loof-$pkg"
+mkdir $D
+cp /lib/liblove.so* $D
+cat /bin/love loof.love > $D/loof
+chmod +x $D/loof
+zip -9r $D.zip $D
+rm -fr $D

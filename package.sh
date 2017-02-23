@@ -21,7 +21,7 @@ pkg='linux64'
 
 D="loof-$pkg"
 mkdir $D
-cp /lib/liblove.so* $D
+cp -a /lib/liblove.so* $D
 cat /bin/love loof.love > $D/loof
 chmod +x $D/loof
 zip -9r $D.zip $D

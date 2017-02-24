@@ -60,7 +60,9 @@ local function manage(dude, dt)
 
     if infos.mode == 'agressive' then
         local tgt, dist
-        tgt, dist, x, y = dude:targets(game.board.guy)
+        -- TODO: check all players instead of random one
+        local some_dude = game.board.players[math.random(1, #game.board.players)]
+        tgt, dist, x, y = dude:targets(some_dude)
         if not dude.boosted and tgt and dist < 100 then
             dude:boost(dt)
         end

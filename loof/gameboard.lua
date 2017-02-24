@@ -32,8 +32,8 @@ function Board:new()
     local level = require('levels.' .. cfg.level)
     self.world = love.physics.newWorld(0, 0, true)
     self.world:setCallbacks(nil, nil, solve_collision)
-
     self.background = objects.Sprite:new(level.bg, {0,0} )
+    self.players = {}
 
     -- build collision elements from level data
     local edges = love.physics.newBody(self.world, 0, 0)
@@ -49,11 +49,6 @@ function Board:new()
     end
     self.goals = level.goals
 
-    -- player
-    self.guy = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
-    self.guy.img = objects.Sprite:new('p1')
-    self.guy.debug = cfg.DEBUG
-
     -- computer managed dudes
     self.opponents = {}
     self.active_objects = {}
@@ -63,8 +58,6 @@ function Board:new()
         self:add_opponent(p2)
     end
     self.opponents_img = p2
-
-    table.insert(self.active_objects, self.guy)
 
     self.ball = objects.Ball:new( love.physics.newBody(self.world, 0, 0, "dynamic") )
     table.insert(self.active_objects, self.ball)
@@ -100,9 +93,24 @@ function Board:add_opponent(image)
     )
 end
 
+function Board:add_player(image, name, input)
+    local d = objects.Dude:new(love.physics.newBody(self.world, 0, 0, "dynamic") , {color={128, 179, 255}})
+    d.img = image
+    d.name = name
+    d.input = input
+    table.insert(self.players, 1, d)
+    local op_point = {self.background.width / 4, self.background.height/2 }
+    local amp = self.background.height / 5
+    d.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
+        op_point[2] + love.math.random(-amp, amp)
+    )
+end
+
 function Board:reset_state()
-    self.guy.body:setPosition( self.background.width / 4 + math.random(-100, 100), self.background.height/2  + math.random(-100, 100))
-    self.guy:reset()
+    for i, plr in ipairs(self.players) do
+        plr.body:setPosition( self.background.width / 4 + math.random(-100, 100), self.background.height/2  + math.random(-100, 100))
+        plr:reset()
+    end
 
     self.ball.body:setPosition( self.background.width / 2, self.background.height/2 )
     self.ball:reset()
@@ -120,6 +128,9 @@ end
 
 function Board:update(dt)
     self.world:update(dt)
+    for i, g in ipairs(self.players) do
+        g:update(dt)
+    end
     if self.goal_marked then
         self.goal_marked = self.goal_marked + dt
         if self.goal_marked > 3 then
@@ -161,6 +172,9 @@ end
 
 function Board:draw()
     self.background:draw(0, 0)
+    for i, g in ipairs(self.players) do
+        g:draw()
+    end
     for i, g in ipairs(self.active_objects) do
         g:draw()
     end

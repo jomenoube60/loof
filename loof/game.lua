@@ -19,18 +19,20 @@ end
 
 Game = objects.object:clone()
 function Game:new()
+    love.physics.setMeter(cfg.DISTANCE) -- How many pixels for 1 meter
     local self = objects.object.new(self)
-    self.board = Board:new()
-    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
+
+    self.score = {0, 0}
+    self.goal_img = objects.Sprite:new('goal', {0,0} )
+
+    self.cached_menu = MainMenu:new()
+    self.menu = self.cached_menu -- start with MainMenu
+    self:reset()
+
     love.window.setMode(self.board.background.width, self.board.background.height, {
         fullscreen = true,
         vsync = true,
     })
-    self.score = {0, 0}
-    self.goal_img = objects.Sprite:new('goal', {0,0} )
-    self.cached_menu = MainMenu:new()
-    self:reset()
-    self.menu = self.cached_menu -- start with MainMenu
 
     return self
 end
@@ -46,16 +48,16 @@ function Game:update(dt)
             ai.manage(g, dt)
         end
         -- take user input
-        for i, plr in ipairs({'kb', 'kb2', 'gp'}) do
-            if gameInputs:ispressed(plr, 2) then -- escape
+        for i, plr in ipairs(self.board.players) do
+            if gameInputs:ispressed(plr.input, 2) then -- escape
                 self.menu = self.cached_menu
                 return
             end
-            if gameInputs:ispressed(plr, 1) then -- ok / boost
-                self.board.guy:boost(dt)
+            if gameInputs:ispressed(plr.input, 1) then -- ok / boost
+                plr:boost(dt)
             end
-            local x, y = gameInputs:getAxis(plr) -- direction keys
-            self.board.guy:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+            local x, y = gameInputs:getAxis(plr.input) -- direction keys
+            plr:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
         end
     else
         self.menu:update(dt)
@@ -110,6 +112,11 @@ function Game:reset()
         self.board:reset_state() -- resets guy, ball & opponents states
     end
     self.board = Board:new()
+    local p1 = objects.Sprite:new('p1')
+    for i, v in ipairs(cfg.players) do
+        self.board:add_player(p1, 'toto', v)
+    end
+
     self.score = {0, 0}
 end
 

@@ -6,7 +6,7 @@ mod.pop_one_level = function()
     else
         love.event.quit()
     end
-    gameInputs.blocked = 0.5
+    gameInputs.blocked = 0.25
 end
 
 return mod

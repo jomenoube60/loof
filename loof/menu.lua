@@ -28,26 +28,26 @@ function Menu:update(dt)
         return
     end
         
-    if gameInputs:ispressed('kb', 'down') then
+    if gameInputs:ispressed('*', 'down') then
         if self.selected < #self.choices then
             self.last_ts = self.ts
             self.selected = self.selected + 1
         end
-    elseif gameInputs:ispressed('kb', 'up') then
+    elseif gameInputs:ispressed('*', 'up') then
         if self.selected > 1 then
             self.last_ts = self.ts
             self.selected = self.selected - 1
         end
-    elseif gameInputs:ispressed('kb', 2) then
+    elseif gameInputs:ispressed('*', 2) then
         self.last_ts = self.ts
         key_funcs.pop_one_level()
-    elseif gameInputs:ispressed('kb', 1) then
+    elseif gameInputs:ispressed('*', 1) then
         self.last_ts = self.ts
         self['handle_' .. self.choices[self.selected]](self, 'return')
-    elseif gameInputs:ispressed('kb', 'left') then
+    elseif gameInputs:ispressed('*', 'left') then
         self.last_ts = self.ts
         self['handle_' .. self.choices[self.selected]](self, 'left')
-    elseif gameInputs:ispressed('kb', 'right') then
+    elseif gameInputs:ispressed('*', 'right') then
         self.last_ts = self.ts
         self['handle_' .. self.choices[self.selected]](self, 'right')
     end

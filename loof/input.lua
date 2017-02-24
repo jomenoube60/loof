@@ -1,5 +1,5 @@
 local Inputs = objects.object:clone()
-Inputs.list = objects.object:new()
+Inputs.list = {}
 
 BTN_UP = 1
 BTN_DOWN = 2
@@ -24,7 +24,7 @@ function Inputs:add_input(name, input)
     local nr = 1
     while self.list[realname] ~= nil do
         nr = nr + 1
-        realname = name .. 'nr' 
+        realname = name .. nr
     end
     self.list[realname] = input
     return realname
@@ -39,9 +39,16 @@ function Inputs:ispressed(name, keyname)
     if self.blocked > 0 then
         return
     end
-    local l = self.list[name]
-    if l then
-        return self.list[name]:ispressed(keyname)
+    local l = nil
+    if name == '*' then
+        l = self.list
+    else
+        l = {name = self.list[name]}
+    end
+    for name in pairs(l) do
+        if l[name] ~= nil and l[name]:ispressed(keyname) then
+            return true
+        end
     end
 end
 
@@ -60,7 +67,7 @@ end
 gameInputs = Inputs:new()
 
 local KeyboardInput = objects.object:clone()
-function KeyboardInput:new(key_mapping, axis) -- axis order: top, down, left, right
+function KeyboardInput:new(key_mapping, axis) -- axis order: up, down, left, right
     local self = objects.object.new(self)
     self.map = key_mapping
     self.axis = axis

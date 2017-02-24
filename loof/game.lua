@@ -1,5 +1,6 @@
 objects = require('objects')
 cfg = require('config')
+objects = require('objects')
 require('gameboard')
 ai = require('ai')
 key_funcs = require('key_handlers')
@@ -29,9 +30,11 @@ function Game:new()
     })
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
-    -- register keys
-    local keymanager = KeyManager:new()
 
+    -- register keys
+    local keymanager = gameInputs
+
+    --[[
     keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
     keymanager:register('left', function(dt, map)
         if map['top'] or map['down'] then
@@ -61,6 +64,8 @@ function Game:new()
             self.board.guy:push(0, cfg.POWER*dt)
         end
     end)
+    ]]
+
     self.keymanager = keymanager
     self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
@@ -83,21 +88,20 @@ function Game:update(dt)
     if self.menu == nil then
       self.active_keymanager = self.keymanager
       -- general keys
-      self.keymanager:manage(dt)
+--      self.keymanager:manage(dt)
       -- joypad
-      if #joysticks > 0 then
-          if p1joystick:isDown(1) then
-              self.board.guy:boost(dt)
-          end
-          self.board.guy:push(p1joystick:getGamepadAxis("leftx")*cfg.POWER*dt, p1joystick:getGamepadAxis("lefty")*cfg.POWER*dt)
+      if gameInputs:ispressed('gp', 1) then
+          self.board.guy:boost(dt)
       end
-      -- mouse
-      local mx, my = love.mouse.getPosition()
-      if not (mx == 0 and my == 0) then
-          local sx, sy = self.board.guy:distance(mx, my)
-          local s = normalVelocity(sx, sy)
-          self.board.guy:push(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
+      local x, y = gameInputs:getAxis('gp', 'left')
+      self.board.guy:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+      -- keyboard
+      if gameInputs:ispressed('kb', 1) then
+          self.board.guy:boost(dt)
       end
+      local x, y = gameInputs:getAxis('kb')
+      self.board.guy:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+
     else -- submenu keys
       self.active_keymanager = self.menu.keymanager
         self.menu.keymanager:manage(dt)
@@ -152,9 +156,9 @@ function Game:reset()
         self.board:reset_state() -- resets guy, ball & opponents states
     end
     self.board = Board:new()
-    if self.active_keymanager then
-        self.active_keymanager:reset()
-    end
+--    if self.active_keymanager then
+--        self.active_keymanager:reset()
+--    end
     self.score = {0, 0}
 end
 

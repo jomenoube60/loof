@@ -114,8 +114,8 @@ function Game:reset()
     end
     self.board = Board:new()
     local p1 = objects.Sprite:new('p1')
-    for i, v in ipairs(cfg.players) do
-        self.board:add_player(p1, 'toto', v)
+    for name in pairs(gameInputs.list) do
+        self.board:add_player(p1, 'noname', name)
     end
 end
 

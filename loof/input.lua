@@ -118,7 +118,7 @@ KeyboardInput.map = objects.object:new()
 
 -- add default keyboard layout
 Inputs:add_input('kb', KeyboardInput:new( {'space', 'escape'}, {'up', 'down', 'left', 'right'}) )
-Inputs:add_input('kb2', KeyboardInput:new( {'e'}, {'z', 's', 'q', 'd'}) )
+--Inputs:add_input('kb2', KeyboardInput:new( {'e'}, {'z', 's', 'q', 'd'}) )
 
 local JoystickInput = objects.object:clone()
 function JoystickInput:new(joystick)

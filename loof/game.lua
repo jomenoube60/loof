@@ -1,4 +1,3 @@
-objects = require('objects')
 cfg = require('config')
 require('gameboard')
 ai = require('ai')
@@ -29,40 +28,6 @@ function Game:new()
     })
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
-    -- register keys
-    local keymanager = KeyManager:new()
-
-    keymanager:register('space', function(dt) self.board.guy:boost(dt) end)
-    keymanager:register('left', function(dt, map)
-        if map['top'] or map['down'] then
-            self.board.guy:push((-cfg.POWER*dt)*0.5, 0)
-        else
-            self.board.guy:push(-cfg.POWER*dt, 0)
-        end
-    end)
-    keymanager:register('right', function(dt, map)
-        if map['top'] or map['down'] then
-            self.board.guy:push((cfg.POWER*dt)*0.5, 0)
-        else
-            self.board.guy:push(cfg.POWER*dt, 0)
-        end
-    end)
-    keymanager:register('up', function(dt, map)
-        if map['left'] or map['right'] then
-            self.board.guy:push(0, (-cfg.POWER*dt)*0.5)
-        else
-            self.board.guy:push(0, -cfg.POWER*dt)
-        end
-    end)
-    keymanager:register('down', function(dt, map)
-        if map['left'] or map['right'] then
-            self.board.guy:push(0, (cfg.POWER*dt)*0.5)
-        else
-            self.board.guy:push(0, cfg.POWER*dt)
-        end
-    end)
-    self.keymanager = keymanager
-    self.active_keymanager = keymanager
     self.cached_menu = MainMenu:new()
     self:reset()
     self.menu = self.cached_menu -- start with MainMenu
@@ -71,36 +36,29 @@ function Game:new()
 end
 
 function Game:update(dt)
-    if self.menu == nil then
+    gameInputs:update(dt)
+    if self.menu == nil then -- no menu (in game)
+        -- update main game states
         self.board:update(dt)
         -- update opponents
         ai.step(dt)
         for i, g in ipairs(self.board.opponents) do
             ai.manage(g, dt)
         end
-    end
-    -- manage keys
-    if self.menu == nil then
-      self.active_keymanager = self.keymanager
-      -- general keys
-      self.keymanager:manage(dt)
-      -- joypad
-      if #joysticks > 0 then
-          if p1joystick:isDown(1) then
-              self.board.guy:boost(dt)
-          end
-          self.board.guy:push(p1joystick:getGamepadAxis("leftx")*cfg.POWER*dt, p1joystick:getGamepadAxis("lefty")*cfg.POWER*dt)
-      end
-      -- mouse
-      local mx, my = love.mouse.getPosition()
-      if not (mx == 0 and my == 0) then
-          local sx, sy = self.board.guy:distance(mx, my)
-          local s = normalVelocity(sx, sy)
-          self.board.guy:push(s[1]*cfg.POWER*dt, s[2]*cfg.POWER*dt)
-      end
-    else -- submenu keys
-      self.active_keymanager = self.menu.keymanager
-        self.menu.keymanager:manage(dt)
+        -- take user input
+        for i, plr in ipairs({'kb', 'kb2', 'gp'}) do
+            if gameInputs:ispressed(plr, 2) then -- escape
+                self.menu = self.cached_menu
+                return
+            end
+            if gameInputs:ispressed(plr, 1) then -- ok / boost
+                self.board.guy:boost(dt)
+            end
+            local x, y = gameInputs:getAxis(plr) -- direction keys
+            self.board.guy:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+        end
+    else
+        self.menu:update(dt)
     end
 end
 
@@ -152,28 +110,7 @@ function Game:reset()
         self.board:reset_state() -- resets guy, ball & opponents states
     end
     self.board = Board:new()
-    if self.active_keymanager then
-        self.active_keymanager:reset()
-    end
     self.score = {0, 0}
-end
-
-function Game:key_press(key)
-    if key == 'escape' then
-        if self.menu == nil then
-            self.menu = self.cached_menu
-        else
-            self.menu = nil
-        end
-    else
-        if self.menu ~= nil then
-            self.menu:key_press(key)
-        end
-    end
-end
-
-function Game:mousepressed(x, y)
-    self.board.guy:boost()
 end
 
 return {

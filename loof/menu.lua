@@ -7,9 +7,9 @@ function Menu:new(background, choices)
     self.background = objects.Sprite:new(background, {0,0} )
     self.choices = choices
     self.selected = 1
-
-    self.keymanager = KeyManager:new()
---    self.keymanager.idle_time = os.time() + 1
+    self.last_ts = 0
+    self.ts = 0
+    self.repeat_max = 0.2
 
     self.unselected_pics = objects.object:new()
     for i, choice in ipairs(choices) do
@@ -22,24 +22,36 @@ function Menu:new(background, choices)
     return self
 end
 
-function Menu:key_press(key)
-    if key == 'down' then
-        if self.selected == #self.choices then
-            self.selected = 1
-        else
+function Menu:update(dt)
+    self.ts = self.ts + dt
+    if self.last_ts + self.repeat_max > self.ts then
+        return
+    end
+        
+    if gameInputs:ispressed('kb', 'down') then
+        if self.selected < #self.choices then
+            self.last_ts = self.ts
             self.selected = self.selected + 1
         end
-    elseif key == 'up' then
-        if self.selected == 1 then
-            self.selected = #self.choices
-        else
+    elseif gameInputs:ispressed('kb', 'up') then
+        if self.selected > 1 then
+            self.last_ts = self.ts
             self.selected = self.selected - 1
         end
-    elseif key == 'escape' then
+    elseif gameInputs:ispressed('kb', 2) then
+        self.last_ts = self.ts
         key_funcs.pop_one_level()
-    elseif key == 'return' or key == 'right' or key == 'left' then
-        self['handle_' .. self.choices[self.selected]](self, key)
+    elseif gameInputs:ispressed('kb', 1) then
+        self.last_ts = self.ts
+        self['handle_' .. self.choices[self.selected]](self, 'return')
+    elseif gameInputs:ispressed('kb', 'left') then
+        self.last_ts = self.ts
+        self['handle_' .. self.choices[self.selected]](self, 'left')
+    elseif gameInputs:ispressed('kb', 'right') then
+        self.last_ts = self.ts
+        self['handle_' .. self.choices[self.selected]](self, 'right')
     end
+
 end
 
 function Menu:draw()
@@ -82,8 +94,6 @@ end
 function MainMenu:handle_Enemies(from)
     if from == 'right' then
         game.board:add_opponent()
-    elseif from == 'left' then
-        game.board:remove_opponent()
     elseif from == 'left' then
         game.board:remove_opponent()
     end

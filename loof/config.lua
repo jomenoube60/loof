@@ -10,5 +10,5 @@ return {
         {128, 179, 255},
         {255, 170, 204},
     },
-    players = {'kb', 'kb2', }, -- list of player inputs (kb, kb2, gp, gp2, ...)
+    players = {'kb', }, -- list of player inputs (kb, kb2, gp, gp2, ...)
 }

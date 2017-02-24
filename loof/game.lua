@@ -1,3 +1,4 @@
+objects = require('objects')
 cfg = require('config')
 require('gameboard')
 ai = require('ai')
@@ -21,18 +22,18 @@ Game = objects.object:clone()
 function Game:new()
     love.physics.setMeter(cfg.DISTANCE) -- How many pixels for 1 meter
     local self = objects.object.new(self)
-
-    self.score = {0, 0}
-    self.goal_img = objects.Sprite:new('goal', {0,0} )
-
-    self.cached_menu = MainMenu:new()
-    self.menu = self.cached_menu -- start with MainMenu
-    self:reset()
-
+    self.board = Board:new()
+    love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     love.window.setMode(self.board.background.width, self.board.background.height, {
         fullscreen = true,
         vsync = true,
     })
+    self.score = {0, 0}
+    self.goal_img = objects.Sprite:new('goal', {0,0} )
+
+    self.cached_menu = MainMenu:new()
+    self:reset()
+    self.menu = self.cached_menu -- start with MainMenu
 
     return self
 end
@@ -116,8 +117,6 @@ function Game:reset()
     for i, v in ipairs(cfg.players) do
         self.board:add_player(p1, 'toto', v)
     end
-
-    self.score = {0, 0}
 end
 
 return {

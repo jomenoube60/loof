@@ -49,6 +49,7 @@ function Poly2:new(body, coords)
     return self
 end
 
+
 local Ball = baseobj.DrawableInterface:clone()
 
 function Ball:new(body, opts)
@@ -66,6 +67,7 @@ function Ball:new(body, opts)
     self.img = baseobj.Sprite:new('ball')
     return self
 end
+
 
 function Ball:draw()
     baseobj.DrawableInterface.draw(self)

@@ -1,6 +1,6 @@
+loof = require('game')
 objects = require('objects')
 cfg = require('config')
-loof = require('game')
 require('input')
 
 joysticks = objects.object:new()

@@ -147,6 +147,14 @@ function JoystickInput:ispressed(nr)
     end
 end
 
+function love.joystickremoved(joystick)
+    for i, inp in ipairs(gameInputs.list) do
+        if gameInputs.list[inp].joy == joystick then
+            gameInputs.remove_input(inp)
+        end
+    end
+end
+
 function love.joystickadded(joystick)
     gameInputs:add_input('gp', JoystickInput:new(joystick) )
 end

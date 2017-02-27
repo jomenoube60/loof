@@ -24,10 +24,12 @@ function Game:new()
     local self = objects.object.new(self)
     self.board = Board:new()
     love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
-    love.window.setMode(self.board.background.width, self.board.background.height, {
-        fullscreen = true,
-        vsync = true,
-    })
+    -- set mode
+    cfg.modes = love.window.getFullscreenModes()
+    table.sort(cfg.modes, function(a, b) return a.width*a.height < b.width*b.height end)   -- sort from smallest to largest
+
+    cfg.scale = love.graphics.getWidth( )/ 1920 -- compu
+
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
 
@@ -92,6 +94,7 @@ function Game:drawbars(num, color, m, y_offset, right)
 end
 
 function Game:draw()
+    love.graphics.scale(cfg.scale, cfg.scale)
     self.board:draw()
     -- SCORE display
     self:drawbars(self.score[2], cfg.colors[1], 5, 0, false)

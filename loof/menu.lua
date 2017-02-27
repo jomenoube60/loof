@@ -51,7 +51,6 @@ function Menu:update(dt)
         self.last_ts = self.ts
         self['handle_' .. self.choices[self.selected]](self, 'right')
     end
-
 end
 
 function Menu:draw()

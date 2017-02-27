@@ -32,7 +32,10 @@ function Game:new()
     cfg.height = love.graphics.getHeight()
 
     self.score = {0, 0}
-    self.goal_img = objects.Sprite:new('goal', {0,0} )
+    self.goal_imgs = {
+        objects.Sprite:new('goal1', {0,0} ),
+        objects.Sprite:new('goal2', {0,0} )
+    }
 
     self.cached_menu = MainMenu:new()
     self:reset()
@@ -132,7 +135,7 @@ function Game:draw()
     --
     -- goal
     if self.board.goal_marked then
-        self.goal_img:draw(0, 0)
+        self.goal_imgs[self.board.goal_team]:draw(0, 0)
     end
     -- menu
     if self.menu ~= nil then

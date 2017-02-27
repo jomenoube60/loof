@@ -150,6 +150,7 @@ function Board:update(dt)
             if bx > coords[1] and bx < coords[3] and by > coords[2] and by < coords[4] then
                 game.score[i] = game.score[i] + 1
                 self.goal_marked = 1
+                self.goal_team = 3-i
             end
         end
     end

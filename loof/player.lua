@@ -113,9 +113,10 @@ function Dude:update(dt)
     self.body:setLinearVelocity(x, y)
 end
 
-function Dude:push(x, y) -- make the dude move
-    if not self.boosted and not self.slowed_down then
-      self.body:applyForce(x, y)
+function Dude:push(x, y, dt) -- make the dude move
+    if x ~= 0 or y ~= 0 and not self.boosted and not self.slowed_down then
+        local coef = 1/math.sqrt( math.abs(x)^2 + math.abs(y)^2)
+        self.body:applyForce(x*cfg.POWER*dt*coef, y*cfg.POWER*dt*coef)
     end
 end
 

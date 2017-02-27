@@ -72,7 +72,7 @@ function Game:update(dt)
                 plr:boost(dt)
             end
             local x, y = gameInputs:getAxis(plr.input) -- direction keys
-            plr:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+            plr:push(x, y, dt)
             maxx = math.max(maxx, plr.x)
             maxy = math.max(maxy, plr.y)
             minx = math.min(minx, plr.x)

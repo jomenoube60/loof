@@ -79,7 +79,7 @@ local function manage(dude, dt)
     if x then
         local s = normalVelocity(x, y)
         if s and s[1] == s[1] then
-            dude:push(s[1]*dt*cfg.POWER, s[2]*dt*cfg.POWER)
+            dude:push(s[1], s[2], dt)
         end
     end
 end

@@ -8,6 +8,10 @@ else...
 - Install [Löve](https://love2d.org/)
 - run `love loof` after unpacking source
 
+## Screenshots
+
+![Screenshot](http://loof.crava.ch/images/shot.png)
+
 
 ## TODO
 

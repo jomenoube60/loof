@@ -25,10 +25,11 @@ function Game:new()
     self.board = Board:new()
     love.physics.setMeter(cfg.DISTANCE) --the height of a meter our worlds
     -- set mode
-    cfg.modes = love.window.getFullscreenModes()
-    table.sort(cfg.modes, function(a, b) return a.width*a.height < b.width*b.height end)   -- sort from smallest to largest
+--    cfg.modes = love.window.getFullscreenModes()
+--    table.sort(cfg.modes, function(a, b) return a.width*a.height < b.width*b.height end)   -- sort from smallest to largest
 
-    cfg.scale = love.graphics.getWidth( )/ 1920 -- compu
+    cfg.width = love.graphics.getWidth()
+    cfg.height = love.graphics.getHeight()
 
     self.score = {0, 0}
     self.goal_img = objects.Sprite:new('goal', {0,0} )
@@ -36,12 +37,16 @@ function Game:new()
     self.cached_menu = MainMenu:new()
     self:reset()
     self.menu = self.cached_menu -- start with MainMenu
+    cfg.scale = 1
+    cfg.translate = {0,0}
 
     return self
 end
 
 function Game:update(dt)
     gameInputs:update(dt)
+    local maxx, maxy = 0, 0
+    local minx, miny = 2000, 2000
     if self.menu == nil then -- no menu (in game)
         -- update main game states
         self.board:update(dt)
@@ -49,6 +54,10 @@ function Game:update(dt)
         ai.step(dt)
         for i, g in ipairs(self.board.opponents) do
             ai.manage(g, dt)
+            maxx = math.max(maxx, g.x)
+            maxy = math.max(maxy, g.y)
+            minx = math.min(minx, g.x)
+            miny = math.min(miny, g.y)
         end
         -- take user input
         for i, plr in ipairs(self.board.players) do
@@ -61,6 +70,23 @@ function Game:update(dt)
             end
             local x, y = gameInputs:getAxis(plr.input) -- direction keys
             plr:push(x*cfg.POWER*dt, y*cfg.POWER*dt)
+            maxx = math.max(maxx, plr.x)
+            maxy = math.max(maxy, plr.y)
+            minx = math.min(minx, plr.x)
+            miny = math.min(miny, plr.y)
+        end
+        if cfg.autozoom then
+            maxx = math.max(maxx, self.board.ball.x) + cfg.autozoom_margin
+            maxy = math.max(maxy, self.board.ball.y) + cfg.autozoom_margin
+            minx = math.min(minx, self.board.ball.x) - cfg.autozoom_margin
+            miny = math.min(miny, self.board.ball.y) - cfg.autozoom_margin
+
+            cfg.scale = (math.min(cfg.width/(maxx-minx), cfg.height/(maxy-miny)) + cfg.scale)/2
+            if cfg.scale > 2 then
+                cfg.scale = 2
+            end
+            cfg.translate[1] = (cfg.translate[1] + (-cfg.scale*minx))/2
+            cfg.translate[2] = (cfg.translate[2] + (-cfg.scale*miny))/2
         end
     else
         self.menu:update(dt)
@@ -94,7 +120,10 @@ function Game:drawbars(num, color, m, y_offset, right)
 end
 
 function Game:draw()
-    love.graphics.scale(cfg.scale, cfg.scale)
+    if self.menu == nil then
+        love.graphics.translate(unpack(cfg.translate))
+        love.graphics.scale(cfg.scale, cfg.scale)
+    end
     self.board:draw()
     -- SCORE display
     self:drawbars(self.score[2], cfg.colors[1], 5, 0, false)

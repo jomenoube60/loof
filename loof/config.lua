@@ -5,6 +5,8 @@ return {
     DISTANCE = 90,
     DEBUG = false,
     DUDES = 3,
+    autozoom = false,
+    autozoom_margin = 200,
     level = 'level0',
     colors = {
         {128, 179, 255},

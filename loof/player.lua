@@ -69,6 +69,12 @@ end
 
 function Dude:update(dt)
     local x, y = self.body:getLinearVelocity()
+    if self.last_boost ~= nil then
+        self.last_boost = self.last_boost - dt
+        if self.last_boost < 0 then
+            self.last_boost = nil
+        end
+    end
     if self.pushed ~= nil then
         if self.pushed == 1 then
             dprint("PUSHED, SHOOTING !!!")
@@ -96,7 +102,7 @@ function Dude:update(dt)
                 self.pushed = nil
             else
                 self.slowed_down = self.boosted
-                self.last_boost = os.time()
+                self.last_boost = 2
             end
             self.boosted = nil
         end
@@ -133,7 +139,7 @@ function Dude:boost(dt) -- boost button pressed
             ball.body:setLinearVelocity(s[1] * cfg.BALL_SPEED, s[2]*cfg.BALL_SPEED) 
         elseif not self.shot and self.boosted == nil and self.slowed_down == nil then
             dprint("boost !")
-            if not self.last_boost or os.time() - self.last_boost > 2 then
+            if self.last_boost == nil then
                 self.boosted = 0.0001
                 local asx = math.abs(sx)
                 local asy = math.abs(sy)

@@ -13,7 +13,7 @@ function Dude:new(body, opts)
     self.body:setMass(2)
     self.body:setBullet(true)
     self.body:setLinearDamping(0.9)
-    self.fixture:setRestitution(0.8)
+    self.fixture:setRestitution(0.4)
     self.fixture:setFriction(0.3)
     self.fixture:setUserData('Dude')
     self.feet = {0, 0}

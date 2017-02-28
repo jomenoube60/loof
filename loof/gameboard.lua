@@ -87,8 +87,8 @@ function Board:add_opponent(image)
     table.insert(self.opponents, 1, d)
     table.insert(self.active_objects, 1, d)
 
-    local op_point = {self.background.width * 3 / 4, self.background.height/2 }
-    local amp = self.background.height / 5
+    local op_point = {self.background.width/3, self.background.height/2 }
+    local amp = self.background.height / 10
     d.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
         op_point[2] + love.math.random(-amp, amp)
     )
@@ -100,8 +100,8 @@ function Board:add_player(image, name, input)
     d.name = name
     d.input = input
     table.insert(self.players, 1, d)
-    local op_point = {self.background.width / 4, self.background.height/2 }
-    local amp = self.background.height / 5
+    local op_point = {self.background.width / 3, self.background.height/2 }
+    local amp = self.background.height / 10
     d.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
         op_point[2] + love.math.random(-amp, amp)
     )
@@ -109,15 +109,15 @@ end
 
 function Board:reset_state()
     for i, plr in ipairs(self.players) do
-        plr.body:setPosition( self.background.width / 4 + math.random(-100, 100), self.background.height/2  + math.random(-100, 100))
+        plr.body:setPosition( self.background.width / 3 + math.random(-100, 100), self.background.height/2  + math.random(-100, 100))
         plr:reset()
     end
 
     self.ball.body:setPosition( self.background.width / 2, self.background.height/2 )
     self.ball:reset()
 
-    local op_point = {self.background.width * 3 / 4, self.background.height/2 }
-    local amp = self.background.height / 5
+    local op_point = {self.background.width * 2 / 3, self.background.height/2 }
+    local amp = self.background.height / 10
     for i, op in ipairs(self.opponents) do
         op.body:setPosition( op_point[1] + love.math.random( -amp/2, amp/2),
             op_point[2] + love.math.random(-amp, amp)

@@ -36,6 +36,7 @@ function Game:new()
         objects.Sprite:new('goal1', {0,0} ),
         objects.Sprite:new('goal2', {0,0} )
     }
+    self.bar_img = objects.Sprite:new('bar')
 
     self.cached_menu = MainMenu:new()
     self:reset()
@@ -84,12 +85,23 @@ function Game:update(dt)
             minx = math.min(minx, self.board.ball.x) - cfg.autozoom_margin
             miny = math.min(miny, self.board.ball.y) - cfg.autozoom_margin
 
-            cfg.scale = (math.min(cfg.width/(maxx-minx), cfg.height/(maxy-miny)) + cfg.scale)/2
-            if cfg.scale > 2 then
-                cfg.scale = 2
+            if maxx - minx < cfg.width then
+                local mid = minx + (maxx-minx)/2
+                minx = mid - (cfg.width / 2)
+                maxx = mid + (cfg.width / 2)
             end
-            cfg.translate[1] = (cfg.translate[1] + (-cfg.scale*minx))/2
-            cfg.translate[2] = (cfg.translate[2] + (-cfg.scale*miny))/2
+            if maxy - miny < cfg.width then
+                local mid = miny + (maxy-miny)/2
+                miny = mid - (cfg.height / 2)
+                maxy = mid + (cfg.height / 2)
+            end
+
+            cfg.scale = (math.min(cfg.width/(maxx-minx), cfg.height/(maxy-miny)) + cfg.scale)/2
+            if cfg.scale > 1 then
+                cfg.scale = 1
+            end
+            cfg.translate[1] = (cfg.translate[1]*0.9 + (-cfg.scale*minx)*0.1)
+            cfg.translate[2] = (cfg.translate[2]*0.9 + (-cfg.scale*miny) *0.1)
         end
     else
         self.menu:update(dt)
@@ -99,40 +111,36 @@ end
 function Game:drawbars(num, color, m, y_offset, right)
     local y_offset = y_offset or 0
     local lines = 10
-    local w = 10 -- width
-    local h = 30 -- height
+    local w = 20 -- width
+    local h = 40 -- height
     local m = m or 5 -- margin (x)
-    local s = 2 -- shadow
     if right then -- align right
         for i=1,self.score[1] do
             y_offset = math.floor((i-1)/lines) 
-            love.graphics.setColor( 50, 50, 50)
-            love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m-s) + ((w+m)*y_offset*lines), (h+m)*y_offset+(w+m+s), w, h)
-            love.graphics.setColor( unpack(color) )
-            love.graphics.rectangle('fill', self.board.background.width - (w+m)*i - (w+m) + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m), w, h)
+            self.bar_img:draw(cfg.width - (w+m)*i + ((w+m)*y_offset*lines),  (h+m)*y_offset+(w+m))
         end
     else
         for i=1,num do
             y_offset = math.floor((i-1)/lines) 
-            love.graphics.setColor( 50, 50, 50)
-            love.graphics.rectangle('fill', (w+m)*i-(y_offset*(w+m)*lines)+s, (h+m)*y_offset+w+m+s, w, h)
-            love.graphics.setColor( unpack(color) )
-            love.graphics.rectangle('fill', (w+m)*i - (y_offset*(w+m)*lines), (h+m)*y_offset + (w+m), w, h)
+            self.bar_img:draw((w+m)*i - (y_offset*(w+m)*lines), (h+m)*y_offset + (w+m), w, h)
         end
     end
 end
 
 function Game:draw()
-    if self.menu == nil then
-        love.graphics.translate(unpack(cfg.translate))
-        love.graphics.scale(cfg.scale, cfg.scale)
-    end
+    love.graphics.push()
+    love.graphics.translate(unpack(cfg.translate))
+    love.graphics.scale(cfg.scale, cfg.scale)
     self.board:draw()
+    love.graphics.pop()
     -- SCORE display
-    self:drawbars(self.score[2], cfg.colors[1], 5, 0, false)
-    self:drawbars(self.score[1], cfg.colors[2], 5, 0, true)
-    -- overlays
-    --
+    self:drawbars(self.score[2], cfg.colors[1], nil, nil, false)
+    self:drawbars(self.score[1], cfg.colors[2], nil, nil, true)
+    -- overlays, reference resolution is 1080p
+    love.graphics.scale(
+        cfg.width/1920,
+        cfg.height/1080
+    )
     -- goal
     if self.board.goal_marked then
         self.goal_imgs[self.board.goal_team]:draw(0, 0)
@@ -144,6 +152,8 @@ function Game:draw()
 end
 
 function Game:reset()
+    love.graphics.origin()
+    self.score = {0, 0}
     if self.board then
         self.board:reset_state() -- resets guy, ball & opponents states
     end

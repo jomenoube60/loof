@@ -15,8 +15,17 @@ pkg='windows64'
 
 D="loof-$pkg"
 mkdir $D
-cp -r love*win*/*.dll $D
-cat love*win*/love.exe loof.love > $D/loof.exe
+cp -r love*win64*/*.dll $D
+cat love*win64*/love.exe loof.love > $D/loof.exe
+zip -9ry $D.zip $D
+rm -fr $D
+
+pkg='windows32'
+
+D="loof-$pkg"
+mkdir $D
+cp -r love*win32*/*.dll $D
+cat love*win32*/love.exe loof.love > $D/loof.exe
 zip -9ry $D.zip $D
 rm -fr $D
 

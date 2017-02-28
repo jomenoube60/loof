@@ -10,7 +10,7 @@ else...
 
 ## Screenshots
 
-![Screenshot](http://loof.crava.ch/images/shot.png)
+![Screenshot](http://loof.crava.ch/images/shot.jpg)
 
 
 ## TODO

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rm -fr *.zip
+rm -fr *.zip loof.love
 
 cd loof
 find . -name "*.orig" -exec rm {} \;

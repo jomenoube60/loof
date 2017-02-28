@@ -33,7 +33,7 @@ function Board:new()
     self.world = love.physics.newWorld(0, 0, true)
     self.world:setCallbacks(solve_collision)
 
-    self.background = objects.Sprite:new(level.bg, {0,0} )
+    self.background = objects.Sprite:new(level.bg, {0,0} , 'jpg')
     self.players = {}
 
     -- build collision elements from level data

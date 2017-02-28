@@ -84,9 +84,9 @@ end
 
 local Sprite = object:new()
 
-function Sprite:new(filename, origin)
+function Sprite:new(filename, origin, format)
     local self = object.new(self)
-    self.img = love.graphics.newImage('img/' .. filename .. '.png')
+    self.img = love.graphics.newImage('img/' .. filename .. '.' .. (format or 'png'))
     self.width = self.img:getWidth()
     self.height = self.img:getHeight()
     if origin then

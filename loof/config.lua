@@ -1,6 +1,6 @@
 return {
     POWER = 60000,
-    MAX_SPEED = 10000000,
+    MAX_SPEED = 20000000,
     BALL_SPEED = 1000,
     DISTANCE = 90,
     DEBUG = false,
